@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Product;
 
+use App\Models\PermessionModel;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -11,8 +13,16 @@ class UpdateProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Allow access only if the user is an admin
-        return auth()->check() && auth()->user()->isAdmin == 1;
+        if (Auth::check()) {
+            $user = Auth::user();
+            $permission = PermessionModel::where('user_id', $user->id)->first();
+
+            if ($permission && $permission->isAdmin != 1 && $permission->canEditProduct != 1) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Employee\StoreEmployeeRequest;
+use App\Http\Requests\Employee\UpdateEmployeePermessionRequest;
 use App\Http\Requests\Employee\UpdateEmployeeRequest;
 use App\Models\Employee;
 use App\Models\EmployeeImage;
+use App\Models\PermessionModel;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
@@ -19,16 +23,23 @@ class EmployeeController extends Controller
 
     public function index()
     {
-        $employees = Employee::with(['employee_images'])->get();
-        return Inertia::render('Admin/Employee/Index', ['employees' => $employees]);
+        $employees = Employee::with(['employee_images', 'user.permission'])->get();
+        $users = User::get();
+        return Inertia::render('Admin/Employee/Index', ['employees' => $employees, 'users' => $users]);
     }
 
     public function store(StoreEmployeeRequest $request)
     {
-        // Ensure the user is an admin
-        if (auth()->user()->isAdmin != 1) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            $permission = PermessionModel::where('user_id', $user->id)->first();
+
+            if ($permission && $permission->isAdmin != 1) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
         }
+
 
 
 
@@ -110,6 +121,36 @@ class EmployeeController extends Controller
 
 
         return redirect()->back()->with('success', 'Employee Updated Successfully');
+    }
+
+
+
+    public function updatePermession(UpdateEmployeePermessionRequest $request, $id)
+    {
+
+        $employeePermessions = PermessionModel::where('user_id', $id)->get()->first();
+
+
+        $employeePermessions->isAdmin = $request->isAdmin;
+        $employeePermessions->canViewProduct = $request->canViewProduct;
+        $employeePermessions->canViewCompany = $request->canViewCompany;
+        $employeePermessions->canViewCategory = $request->canViewCategory;
+        $employeePermessions->canEditProduct = $request->canEditProduct;
+        $employeePermessions->canEditCompany = $request->canEditCompany;
+        $employeePermessions->canEditCategory = $request->canEditCategory;
+        $employeePermessions->canAddProduct = $request->canAddProduct;
+        $employeePermessions->canViewEmployee = $request->canViewEmployee;
+        $employeePermessions->canEditEmployee = $request->canEditEmployee;
+
+
+
+
+        $employeePermessions->save();
+
+        // // Update the employee with validated data
+        // $employeePermessions->update($request->validated());
+
+        return redirect()->back()->with('success', 'Permessions Updated Successfully');
     }
 
 

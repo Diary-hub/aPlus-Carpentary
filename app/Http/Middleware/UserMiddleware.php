@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class UserMiddleware
 {
     /**
      * Handle an incoming request.
@@ -21,10 +21,10 @@ class AdminMiddleware
             $user = Auth::user();
             $permission = PermessionModel::where('user_id', $user->id)->first();
 
-            if ($permission && $permission->isAdmin == 1) {
+            if ($permission && $permission->isAdmin != 1) {
                 return $next($request);
             }
         }
-        return redirect()->route('user.dashboard')->with('error', "Access denied. You are not admin.");
+        return redirect()->route('admin.dashboard')->with('error', "Access denied. You are admin.");
     }
 }

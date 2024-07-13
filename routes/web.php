@@ -6,22 +6,19 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\User\UserController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\redirectAdmin;
-use Illuminate\Foundation\Application;
+use App\Http\Middleware\UserMiddleware;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Inertia\Inertia;
 
 // User Routes Start
-Route::redirect('/', '/login');
-
+Route::redirect('/', '/admin');
 
 // Route::get('/', function () {
-
-
-
-
 //     return Inertia::render('Welcome', [
 //         'canLogin' => Route::has('login'),
 //         'canRegister' => Route::has('register'),
@@ -30,17 +27,8 @@ Route::redirect('/', '/login');
 //     ]); 
 // });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
-// User Routes End
 
 
 
@@ -58,11 +46,15 @@ Route::group(['prefix' => 'admin', 'middleware' => redirectAdmin::class], functi
 });
 
 
+Route::redirect('/', 'admin/dashboard');
+Route::redirect('/dashboard', 'admin/dashboard');
+Route::redirect('/admin', '/dashboard');
+
 Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(function () {
 
-    //Dashboard Route
-    Route::redirect('/', 'admin/dashboard');
-    Route::redirect('/admin', 'admin/dashboard');
+
+
+
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
     //Products Route
@@ -92,12 +84,59 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(func
     Route::get('/employees', [EmployeeController::class, 'index'])->name('admin.employees.index');
     Route::post('/employees/store', [EmployeeController::class, 'store'])->name('admin.employees.store');
     Route::put('/employees/update/{id}', [EmployeeController::class, 'update'])->name('admin.employees.update');
+    Route::put('/employees/permession/update/{id}', [EmployeeController::class, 'updatePermession'])->name('admin.employees.permession.update');
     Route::delete('/employees/destroy/{id}', [EmployeeController::class, 'destroy'])->name('admin.employees.destroy');
     Route::delete('/employees/image/{id}', [EmployeeController::class, 'deleteImage'])->name('admin.employees.image.delete');
 });
-
-
-
 // Admin Routes End
+
+
+
+// User Route Start
+
+//Dashboard Route
+Route::redirect('/', 'user/dashboard');
+Route::redirect('/dashboard', 'user/dashboard');
+Route::redirect('/user', 'dashboard');
+Route::middleware(['auth', UserMiddleware::class])->prefix('user')->group(function () {
+
+    Route::get('dashboard', [UserController::class, 'index'])->name('user.dashboard');
+
+    Route::get('/permessions', [UserController::class, 'permessions'])->name('user.permessions');
+    //Products Route
+    Route::get('/products', [ProductController::class, 'index'])->name('user.products.index');
+    Route::get('/products/supply', [ProductController::class, 'supply'])->name('user.products.supply');
+    Route::post('/products/supply/{id}', [ProductController::class, 'refill'])->name('user.products.supply.add');
+    Route::post('/products/store', [ProductController::class, 'store'])->name('user.products.store');
+    Route::put('/products/update/{id}', [ProductController::class, 'update'])->name('user.products.update');
+    Route::delete('/products/destroy/{id}', [ProductController::class, 'destroy'])->name('user.products.destroy');
+
+
+
+    //Companies Route
+    Route::get('/companies', [CompanyController::class, 'index'])->name('user.companies.index');
+    Route::post('/companies/store', [CompanyController::class, 'store'])->name('user.companies.store');
+    Route::put('/companies/update/{id}', [CompanyController::class, 'update'])->name('user.companies.update');
+    Route::delete('/companies/destroy/{id}', [CompanyController::class, 'destroy'])->name('user.companies.destroy');
+
+
+    //Categores Route
+    Route::get('/categories', [CategoryController::class, 'index'])->name('user.categories.index');
+    Route::post('/categories/store', [CategoryController::class, 'store'])->name('user.categories.store');
+    Route::put('/categories/update/{id}', [CategoryController::class, 'update'])->name('user.categories.update');
+    Route::delete('/categories/destroy/{id}', [CategoryController::class, 'destroy'])->name('user.categories.destroy');
+
+    //Employee Route
+    Route::get('/employees', [EmployeeController::class, 'index'])->name('user.employees.index');
+    Route::post('/employees/store', [EmployeeController::class, 'store'])->name('user.employees.store');
+    Route::put('/employees/update/{id}', [EmployeeController::class, 'update'])->name('user.employees.update');
+    Route::put('/employees/permession/update/{id}', [EmployeeController::class, 'updatePermession'])->name('user.employees.permession.update');
+    Route::delete('/employees/destroy/{id}', [EmployeeController::class, 'destroy'])->name('user.employees.destroy');
+    Route::delete('/employees/image/{id}', [EmployeeController::class, 'deleteImage'])->name('user.employees.image.delete');
+});
+
+// User Route End
+
+
 
 require __DIR__ . '/auth.php';

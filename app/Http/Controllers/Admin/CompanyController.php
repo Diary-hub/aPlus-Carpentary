@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Company\StoreCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
 use App\Models\Company;
+use App\Models\PermessionModel;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 
@@ -16,14 +19,27 @@ class CompanyController extends Controller
     public function index()
     {
         $companies = Company::all();
-        return Inertia::render('Admin/Company/Index', ['companies' => $companies]);
+        $user = User::with(['permission', 'employee'])->find(Auth::id());
+        $permission = $user->permission;
+
+        if ($permission->isAdmin === 1) {
+            return Inertia::render('Admin/Company/Index', ['companies' => $companies]);
+        } else if ($permission->canViewCompany) {
+
+            return Inertia::render('User/Company/Index', ['permission' => $permission, 'companies' => $companies]);
+        }
     }
 
     public function store(StoreCompanyRequest $request)
     {
-        // Ensure the user is an admin
-        if (auth()->user()->isAdmin != 1) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            $permission = PermessionModel::where('user_id', $user->id)->first();
+
+            if ($permission && $permission->isAdmin != 1 && $permission->canEditCompany != 1) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
         }
 
 
@@ -57,6 +73,6 @@ class CompanyController extends Controller
     {
         $company = Company::findOrFail($id);
         $company->delete();
-        return redirect()->route('admin.companies.index')->with('success', 'Company Deleted Successfully');
+        return redirect()->back()->with('success', 'Company Deleted Successfully');
     }
 }

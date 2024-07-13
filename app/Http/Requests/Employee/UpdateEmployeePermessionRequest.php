@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Requests\Company;
+namespace App\Http\Requests\Employee;
 
 use App\Models\PermessionModel;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class UpdateCompanyRequest extends FormRequest
+class UpdateEmployeePermessionRequest extends FormRequest
 {
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -17,8 +18,8 @@ class UpdateCompanyRequest extends FormRequest
             $user = Auth::user();
             $permission = PermessionModel::where('user_id', $user->id)->first();
 
-            if ($permission && $permission->isAdmin != 1 && $permission->canEditCompany != 1) {
-                return false;
+            if ($permission && $permission->isAdmin != 1) {
+                return response()->json(['message' => 'Unauthorized'], 403);
             }
         }
 
@@ -33,12 +34,23 @@ class UpdateCompanyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:200',
+            'canViewCategory' => 'required',
+            'isAdmin' => 'required',
+            'canViewProduct' => 'required',
+            'canViewCompany' => 'required',
+            'canEditProduct' => 'required',
+            'canEditCompany' => 'required',
+            'canEditCategory' => 'required',
+            'canAddProduct' => 'required',
+            'canViewEmployee' => 'required',
+            'canEditEmployee' => 'required',
 
+            'user_id' => 'nullable|integer',
             'created_by' => 'nullable|integer',
             'updated_by' => 'nullable|integer',
             'deleted_by' => 'nullable|integer',
             'deleted_at' => 'nullable',
+
 
         ];
     }

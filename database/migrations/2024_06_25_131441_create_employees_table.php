@@ -17,12 +17,14 @@ return new class extends Migration
             $table->string('name');
             $table->string('phone');
             $table->string('address');
+            $table->string('type');
             $table->longText('description')->nullable();
             $table->string('gender');
             $table->string('age');
             $table->longText('image')->nullable();
             $table->decimal('salary', 10, 2);
             $table->foreignIdFor(User::class, 'created_by')->nullable();
+            $table->foreignIdFor(User::class, 'user_id');
             $table->foreignIdFor(User::class, 'updated_by')->nullable();
             $table->softDeletes();
             $table->foreignIdFor(User::class, 'deleted_by')->nullable();

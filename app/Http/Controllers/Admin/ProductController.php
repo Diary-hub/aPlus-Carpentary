@@ -9,7 +9,11 @@ use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Invoice;
+use App\Models\PermessionModel;
 use App\Models\Product;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 
@@ -17,12 +21,19 @@ class ProductController extends Controller
 {
 
 
-    public function index()
+    public function index(Request $request)
     {
         $products = Product::with(['company', 'category'])->get();
         $categories = Category::all();
         $companies = Company::all();
-        return Inertia::render('Admin/Product/Index', ['products' => $products, 'categories' => $categories, 'companies' => $companies]);
+        $user = User::with(['permission', 'employee'])->find(Auth::id());
+        $permission = $user->permission;
+        if ($permission->isAdmin === 1) {
+            return Inertia::render('Admin/Product/Index', ['products' => $products, 'categories' => $categories, 'companies' => $companies]);
+        } else if ($permission->canViewProduct) {
+
+            return Inertia::render('User/Product/Index', ['permission' => $permission, 'products' => $products, 'categories' => $categories, 'companies' => $companies]);
+        }
     }
 
 
@@ -34,9 +45,14 @@ class ProductController extends Controller
 
     public function refill(SupplyProductRequest $request, $id)
     {
-        // Ensure the user is an admin
-        if (auth()->user()->isAdmin != 1) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            $permission = PermessionModel::where('user_id', $user->id)->first();
+
+            if ($permission && $permission->isAdmin != 1) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
         }
 
 
@@ -64,9 +80,13 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        // Ensure the user is an admin
-        if (auth()->user()->isAdmin != 1) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        $user = Auth::user();
+        $permission = PermessionModel::where('user_id', $user->id)->first();
+
+        if (Auth::check()) {
+            if ($permission && $permission->isAdmin != 1 && $permission->canEditProduct != 1) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
         }
 
 
@@ -99,7 +119,7 @@ class ProductController extends Controller
         //     'product' => $product
         // ], 201);
 
-        return redirect()->route('admin.products.index')->with('success', 'Product Created Successfully');
+        return redirect()->back()->with('success', 'Product Created Successfully');
     }
 
     public function edit()
@@ -107,17 +127,18 @@ class ProductController extends Controller
     }
     public function update(UpdateProductRequest $request, $id)
     {
+        $user = Auth::user();
+        $permission = PermessionModel::where('user_id', $user->id)->first();
+
+        if (Auth::check()) {
+            if ($permission && $permission->isAdmin != 1 && $permission->canEditProduct != 1) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+        }
+
         $product = Product::findOrFail($id);
 
-        // $product->name = $request->name;
-        // $product->quantity = $request->quantity;
-        // $product->color = $request->color;
-        // $product->description = $request->description;
-        // $product->dinar_price = $request->dinar_price;
-        // $product->dolar_price = $request->dolar_price;
-        // $product->dolar_data = $request->dolar_data;
-        // $product->category_id = $request->category_id;
-        // $product->company_id = $request->company_id;
+
 
         // Update the product with validated data
         $product->update($request->validated());

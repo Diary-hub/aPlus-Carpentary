@@ -11,6 +11,20 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+
+    // Define the relationship to Permession
+    public function permission()
+    {
+        return $this->hasOne(PermessionModel::class);
+    }
+
+    // Define the relationship to Employee
+    public function employee()
+    {
+        return $this->hasOne(Employee::class);
+    }
+
+
     /**
      * The attributes that are mass assignable.
      *

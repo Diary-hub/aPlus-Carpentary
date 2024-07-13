@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\Category;
-
+use App\Models\PermessionModel;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 
@@ -17,17 +19,29 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::all();
-        return Inertia::render('Admin/Category/Index', ['categories' => $categories]);
+        $user = User::with(['permission', 'employee'])->find(Auth::id());
+        $permission = $user->permission;
+
+        if ($permission->isAdmin === 1) {
+            return Inertia::render('Admin/Category/Index', ['categories' => $categories]);
+        } else if ($permission->canViewCompany) {
+
+            return Inertia::render('User/Category/Index', ['permission' => $permission, 'categories' => $categories]);
+        }
     }
 
     public function store(StoreCategoryRequest $request)
     {
-        // Ensure the user is an admin
-        if (auth()->user()->isAdmin != 1) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            $permission = PermessionModel::where('user_id', $user->id)->first();
+
+            if ($permission && $permission->isAdmin != 1 && $permission->canEditCategory != 1) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
         }
-
-
 
 
         // Create and save the product using mass assignment
@@ -35,7 +49,7 @@ class CategoryController extends Controller
 
 
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category Created Successfully');
+        return redirect()->back()->with('success', 'Category Created Successfully');
     }
 
     public function edit()
@@ -43,6 +57,14 @@ class CategoryController extends Controller
     }
     public function update(UpdateCategoryRequest $request, $id)
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+            $permission = PermessionModel::where('user_id', $user->id)->first();
+
+            if ($permission && $permission->isAdmin != 1 && $permission->canEditCategory != 1) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+        }
         $category = Category::findOrFail($id);
 
         // Update the product with validated data
@@ -58,6 +80,6 @@ class CategoryController extends Controller
     {
         $category = Category::findOrFail($id);
         $category->delete();
-        return redirect()->route('admin.categories.index')->with('success', 'Category Deleted Successfully');
+        return redirect()->back()->with('success', 'Category Deleted Successfully');
     }
 }

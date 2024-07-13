@@ -12,6 +12,7 @@ class Employee extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'user_id',
         'name',
         'phone',
         'address',
@@ -22,9 +23,15 @@ class Employee extends Model
         'description',
         'created_by',
         'updated_by',
+        'type',
         'deleted_by',
         'deleted_at'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
 
     public function employee_images()

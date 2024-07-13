@@ -5,197 +5,111 @@ import Swal from 'sweetalert2';
 import { watch } from 'vue';
 
 
-
-
 const props = defineProps({
-
-    employees: Array,
-    users: Array
+    permission: {
+        type: Object,
+        required: true,
+        default: () => ({})
+    },
+    products: Array
 })
 
 
 
-const isAddEmployee = ref(false);
+const categories = usePage().props.categories;
+const companies = usePage().props.companies;
+
+const isAddProduct = ref(false);
 const dialogVisible = ref(false);
 const editMode = ref(false);
 
 
-const fileList = ref([]);
 
 
 const id = ref('');
-const user = ref('null');
 const name = ref('');
-const phone = ref('');
-const address = ref('');
-const type = ref('normal');
-const gender = ref('null');
-const age = ref('');
-const image = ref('');
-const salary = ref('');
+const quantity = ref('');
+const color = ref('');
 const description = ref('');
-
-const employee_images = ref([]);
-const employeeImages = ref([]);
-
-const dialogImageUrl = ref('');
-
-
-const isAdmin = ref('');
-
-
-
-
-const canViewProduct = ref('');
-const canViewCompany = ref('');
-const canViewCategory = ref('');
-
-const canEditProduct = ref('');
-const canEditCompany = ref('');
-const canEditCategory = ref('');
-
-const canAddProduct = ref('');
-
-const canViewEmployee = ref('');
-
-const canEditEmployee = ref('');
-
-
-
-
-
-
-const handleFileChange = (file) => {
-    employeeImages.value.push(file);
-}
-
-
-const handlePictureCardPreview = (file) => {
-    dialogImageUrl.value = file.url;
-    dialogVisible.value = true;
-}
-
-
-const handleRemove = (file) => {
-    console.log(file);
-
-}
-
-
-
-
-
-
+const dolar_data = ref('');
+const dolar_price = ref('');
+const dinar_price = ref('');
+const inStock = ref('');
+const published = ref('');
+const company_id = ref('');
+const category_id = ref('');
 
 const resetDatas = () => {
 
     id.value = '';
-    user.value = 'null';
-    type.value = 'normal';
     name.value = '';
-    phone.value = '';
-    address.value = '';
-    gender.value = 'null';
-    age.value = '';
-    image.value = '';
-    salary.value = '';
+    quantity.value = '';
+    color.value = '';
     description.value = '';
-    dialogImageUrl.value = '';
-    employee_images.value = '';
-    employeeImages.value = '';
-
-
-    isAdmin.value = '';
-    canViewProduct.value = '';
-    canViewCompany.value = '';
-    canViewCategory.value = '';
-    canEditProduct.value = '';
-    canEditCompany.value = '';
-    canEditCategory.value = '';
-    canAddProduct.value = '';
-    canViewEmployee.value = '';
-    canEditEmployee.value = '';
-
+    dolar_data.value = '';
+    dolar_price.value = '';
+    dinar_price.value = '';
+    inStock.value = '';
+    published.value = '';
+    company_id.value = '';
+    category_id.value = '';
 
 
 }
 
 const openAddModal = () => {
-    isAddEmployee.value = true;
+    isAddProduct.value = true;
     dialogVisible.value = true;
     editMode.value = false;
     resetDatas();
-
+    quantity.value = 0;
 
 
 }
 
-
-
-
-
-
-
-const openEditModal = (employee) => {
-    isAddEmployee.value = false;
+const openEditModal = (product) => {
+    isAddProduct.value = false;
     editMode.value = true;
     dialogVisible.value = true;
 
 
-    // Update the data based on the selected employee
-    id.value = employee.id;
-    user.value = employee.user_id;
-    name.value = employee.name;
-    phone.value = employee.phone;
-    type.value = employee.type;
-    address.value = employee.address;
-    gender.value = employee.gender;
-    age.value = employee.age;
-    image.value = employee.image;
-    salary.value = employee.salary;
-    description.value = employee.description;
-    employee_images.value = employee.employee_images;
-
-
-
-    isAdmin.value = employee.user.permission.isAdmin;
-    canViewProduct.value = employee.user.permission.canViewProduct;
-    canViewCompany.value = employee.user.permission.canViewCompany;
-    canViewCategory.value = employee.user.permission.canViewCategory;
-    canEditProduct.value = employee.user.permission.canEditProduct;
-    canEditCompany.value = employee.user.permission.canEditCompany;
-    canEditCategory.value = employee.user.permission.canEditCategory;
-    canAddProduct.value = employee.user.permission.canAddProduct;
-    canViewEmployee.value = employee.user.permission.canViewEmployee;
-    canEditEmployee.value = employee.user.permission.canEditEmployee;
-
+    // Update the data based on the selected product
+    id.value = product.id;
+    name.value = product.name;
+    color.value = product.color;
+    dinar_price.value = product.dinar_price;
+    dolar_price.value = product.dolar_price;
+    dolar_data.value = product.dolar_data;
+    quantity.value = product.quantity;
+    description.value = product.description;
+    category_id.value = product.category_id;
+    company_id.value = product.company_id;
 }
 
 
 
 
 
-const addEmployee = async () => {
+watch([dolar_price, dolar_data], () => {
+    dinar_price.value = dolar_price.value * dolar_data.value;
+});
+
+
+
+const addProduct = async () => {
     const formData = new FormData();
     formData.append('name', name.value);
-    formData.append('phone', phone.value);
-    formData.append('address', address.value);
-    formData.append('gender', gender.value);
-    formData.append('age', age.value);
-    formData.append('image', image.value);
-    formData.append('salary', salary.value);
+    formData.append('color', color.value);
+    formData.append('dinar_price', dinar_price.value);
+    formData.append('dolar_price', dolar_price.value);
+    formData.append('dolar_data', dolar_data.value);
+    formData.append('quantity', quantity.value);
     formData.append('description', description.value);
-    formData.append('user_id', user.value);
-    formData.append('type', type.value);
-
-
-    for (const image of employeeImages.value) {
-        formData.append('employee_images[]', image.raw)
-    }
-
+    formData.append('category_id', category_id.value);
+    formData.append('company_id', company_id.value);
 
     try {
-        await router.post('employees/store', formData, {
+        await router.post('products/store', formData, {
             onSuccess: page => {
                 Swal.fire({
                     toast: true,
@@ -234,47 +148,22 @@ const addEmployee = async () => {
 
 
 
-const updateEmployee = async () => {
+const updateProduct = async () => {
     const formData = new FormData();
     formData.append('name', name.value);
-    formData.append('phone', phone.value);
-    formData.append('address', address.value);
-    formData.append('gender', gender.value);
-    formData.append('age', age.value);
-    formData.append('image', image.value);
-    formData.append('salary', salary.value);
+    formData.append('color', color.value);
+    formData.append('dinar_price', dinar_price.value);
+    formData.append('dolar_price', dolar_price.value);
+    formData.append('dolar_data', dolar_data.value);
+    formData.append('quantity', quantity.value);
     formData.append('description', description.value);
-    formData.append('user_id', user.value);
-    formData.append('type', type.value);
-
+    formData.append('category_id', category_id.value);
+    formData.append('company_id', company_id.value);
     formData.append('_method', "PUT");
 
 
-
-    const formDataPermessions = new FormData();
-    formDataPermessions.append('isAdmin', isAdmin.value);
-    formDataPermessions.append('canViewProduct', canViewProduct.value);
-    formDataPermessions.append('canViewCompany', canViewCompany.value);
-    formDataPermessions.append('canViewCategory', canViewCategory.value);
-    formDataPermessions.append('canEditProduct', canEditProduct.value);
-    formDataPermessions.append('canEditCompany', canEditCompany.value);
-    formDataPermessions.append('canEditCategory', canEditCategory.value);
-    formDataPermessions.append('canAddProduct', canAddProduct.value);
-    formDataPermessions.append('canViewEmployee', canViewEmployee.value);
-    formDataPermessions.append('canEditEmployee', canEditEmployee.value);
-
-    formDataPermessions.append('_method', "PUT");
-
-
-
-
-
-    for (const image of employeeImages.value) {
-        formData.append('employee_images[]', image.raw)
-    }
-
     try {
-        await router.post('employees/update/' + id.value, formData, {
+        await router.post('products/update/' + id.value, formData, {
             onSuccess: page => {
                 Swal.fire({
                     toast: true,
@@ -282,36 +171,6 @@ const updateEmployee = async () => {
                     position: 'top-end',
                     showConfirmButton: false,
                     timer: 3000,
-                    title: page.props.flash.success
-                })
-
-                dialogVisible.value = false;
-
-
-
-
-
-            },
-            onError: error => {
-                console.log(error);
-            }
-
-
-        })
-
-
-
-
-
-
-        await router.post('employees/permession/update/' + user.value, formDataPermessions, {
-            onSuccess: page => {
-                Swal.fire({
-                    toast: true,
-                    icon: 'success',
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 2000,
                     title: page.props.flash.success
                 })
 
@@ -328,8 +187,6 @@ const updateEmployee = async () => {
 
 
         })
-
-
     } catch (error) {
         console.log(error);
     }
@@ -340,7 +197,7 @@ const updateEmployee = async () => {
 }
 
 
-const deleteEmployee = (employee, index) => {
+const deleteProduct = (product, index) => {
 
     Swal.fire({
 
@@ -356,10 +213,10 @@ const deleteEmployee = (employee, index) => {
     }).then((result) => {
         if (result.isConfirmed) {
             try {
-                router.delete('employees/destroy/' + employee.id, {
+                router.delete('products/destroy/' + product.id, {
                     onSuccess: (page) => {
-
-                        this.delete(employee, index);
+                        //                        props.products.splice(index, 1);
+                        this.delete(product, index);
 
 
                         Swal.fire({
@@ -392,39 +249,6 @@ const deleteEmployee = (employee, index) => {
 }
 
 
-
-const deleteImage = async (eimage, index) => {
-
-    try {
-
-        await router.delete('/admin/employees/image/' + eimage.id, {
-            onSuccess: (page) => {
-                employee_images.value.splice(index, 1);
-                Swal.fire({
-                    toast: true,
-                    icon: 'success',
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 2000,
-                    title: page.props.flash.success
-                })
-
-            },
-            onError: error => {
-                console.log(error);
-            }
-
-        })
-
-    } catch (error) {
-        console.log(error);
-
-    }
-
-
-}
-
-
 </script>
 
 <template>
@@ -434,263 +258,77 @@ const deleteImage = async (eimage, index) => {
         <el-dialog v-model="dialogVisible" width="500" :before-close="handleClose" style="border-radius: 2%">
             <section class=" bg-white dark:bg-gray-900">
                 <div class="py-8 px-4 mx-auto max-w-2xl ">
-                    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ editMode ? 'Edit Employee' :
-                        'Add Employee' }}</h2>
-                    <form @submit.prevent=" editMode ? updateEmployee() : addEmployee()">
+                    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ editMode ? 'Edit Product' :
+                        'Add Product' }}</h2>
+                    <form @submit.prevent=" editMode ? updateProduct() : addProduct()">
                         <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
-
-                            <div>
-                                <label for="user"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">User</label>
-                                <select v-model="user" id="user"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="null" value="null" selected disabled>
-                                        Select User </option>
-
-                                    <option v-for="user in users" :key="user.id" :value="user.id">
-                                        {{ user.name }}</option>
-
-                                </select>
-                            </div>
-                            <div>
-                                <label for="type"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Type</label>
-                                <select v-model="type" id="type"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-
-
-                                    <option key="normal" value="normal" selected>
-                                        Normal</option>
-
-                                    <option key="wasta" value="wasta" selected>
-                                        Wasta</option>
-
-                                </select>
-                            </div>
                             <div class="sm:col-span-2">
                                 <label for="name"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Employee
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Product
                                     Name</label>
                                 <input v-model="name" type="text" name="name" id="name"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Type Employee Name" required="">
+                                    placeholder="Type product name" required="">
                             </div>
                             <div class="w-full">
-                                <label for="phone"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
-                                <input v-model="phone" type="text" name="phone" id="phone"
+                                <label for="color"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Color</label>
+                                <input v-model="color" type="text" name="color" id="color"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Employee Phone" required="">
+                                    placeholder="Product color" required="">
                             </div>
                             <div class="w-full">
-                                <label for="age"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Age</label>
-                                <input v-model="age" type="number" name="age" id="age"
+                                <label for="dinar_price"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Dinar
+                                    Price</label>
+                                <input v-model="dinar_price" type="text" name="dinar_price" id="dinar_price"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Employee Age" required>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label for="address"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
-                                <input v-model.number="address" type="text" name="address" id="address"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Employee Address" required>
+                                    placeholder="IQD" required>
                             </div>
                             <div class="w-full">
-                                <label for="salary"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Salary</label>
-                                <input v-model.number="salary" type="text" name="salary" id="salary"
+                                <label for="dolar_price"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Dolar
+                                    Price</label>
+                                <input v-model.number="dolar_price" type="text" name="dolar_price" id="dolar_price"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Employee Salary" required>
+                                    placeholder="$" required>
+                            </div>
+                            <div class="w-full">
+                                <label for="dolar_data"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Dolar
+                                    Data</label>
+                                <input v-model.number="dolar_data" type="text" name="dolar_data" id="dolar_data"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="$=IQD" required>
                             </div>
                             <div>
-                                <label for="gender"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Gender</label>
-                                <select v-model="gender" id="gender"
+                                <label for="category_id"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
+                                <select v-model="category_id" id="category_id"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="null" value="null" selected disabled>
-                                        Select Gender </option>
-                                    <option key="1" value="1">
-                                        Male </option>
-                                    <option key="2" value="2">
-                                        Female </option>
+                                    <option v-for="category in categories" :key="category.id" :value="category.id">
+                                        {{ category.name }}</option>
 
                                 </select>
                             </div>
+                            <div>
+                                <label for="company_id"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company</label>
+                                <select v-model="company_id" id="category"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                    <option v-for="company in companies" :key="company.id" :value="company.id">
+                                        {{ company.name }}</option>
 
+                                </select>
+                            </div>
                             <div class="sm:col-span-2">
                                 <label for="description"
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                                <textarea v-model="description" id="description" rows="3"
+                                <textarea v-model="description" id="description" rows="8"
                                     class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                     placeholder="Your description here"></textarea>
                             </div>
                         </div>
-                        <br>
-                        <!-- Images Start here -->
-
-                        <div class="grid md:gap-6">
-                            <div class="relative z-0 w-full mb-6 group">
-                                <el-upload v-model:file-list="employeeImages" multiple list-type="picture-card"
-                                    :on-preview="handlePictureCardPreview" :on-remove="handleRemove"
-                                    :on-change="handleFileChange">
-                                    <el-icon>
-                                        <Plus />
-                                    </el-icon>
-                                </el-upload>
-
-                            </div>
-
-                        </div>
-
-                        <!-- Images End Here -->
-
-                        <br>
-
-                        <div class="flex flex-nowrap mb-8 gap-1">
-
-                            <div v-for="(eimage, index) in employee_images" class="relative w-32 h-32 ">
-                                <img class=" w-32 h-32 rounded" :src="eimage.image" alt="">
-                                <span
-                                    class="absolute top-2 right-0 transform -translate-y-1/2 w-3.5 h-3.5 bg-red-400     border-2 border-white dark:border-gray-800 rounded-full">
-                                    <span @click="deleteImage(eimage, index)"
-                                        class="text-white text-xs font-vold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">x</span>
-                                </span>
-                            </div>
-                        </div>
-
-                        <br>
-
-                        <div class="flex flex-wrap mb-8 gap-8" v-if="editMode">
-
-                            <div>
-                                <label for="isAdmin"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Admin</label>
-                                <select v-model="isAdmin" id="isAdmin"
-                                    class=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canViewProduct"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">View
-                                    Product</label>
-                                <select v-model="canViewProduct" id="canViewProduct"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canViewCompany"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">View
-                                    Company</label>
-                                <select v-model="canViewCompany" id="canViewCompany"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canViewCategory"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">View
-                                    Category</label>
-                                <select v-model="canViewCategory" id="canViewCategory"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canEditProduct"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Edit
-                                    Product</label>
-                                <select v-model="canEditProduct" id="canEditProduct"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canEditCompany"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Edit
-                                    Company</label>
-                                <select v-model="canEditCompany" id="canEditCompany"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-
-                            <div>
-                                <label for="canEditCategory"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Edit
-                                    Category</label>
-                                <select v-model="canEditCategory" id="canEditCategory"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-
-                            <div>
-                                <label for="canAddProduct"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Add
-                                    Product</label>
-                                <select v-model="canAddProduct" id="canAddProduct"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-
-                            <div>
-                                <label for="canViewEmployee"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">View
-                                    Employee</label>
-                                <select v-model="canViewEmployee" id="canViewEmployee"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canEditEmployee"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Edit
-                                    Employee</label>
-                                <select v-model="canEditEmployee" id="canEditEmployee"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                        </div>
-
-
-
                         <br>
                         <button type="submit"
                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">{{
@@ -701,10 +339,6 @@ const deleteImage = async (eimage, index) => {
 
         </el-dialog>
         <!-- Dialog End -->
-
-
-
-
         <div class="mx-auto max-w-screen-xl px-4 lg:px-12 ">
             <!-- Start coding here -->
             <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
@@ -730,17 +364,18 @@ const deleteImage = async (eimage, index) => {
                     </div>
                     <div
                         class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                        <button type="button" @click="openAddModal"
+                        <button type="button" @click="openAddModal" v-if="permission.canEditProduct"
                             class="flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primarbluey-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                             <svg class="h-3.5 w-3.5 mr-2" fill="currentColor" viewbox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path clip-rule="evenodd" fill-rule="evenodd"
                                     d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
                             </svg>
-                            Add employee
+                            Add product
                         </button>
                         <div class="flex items-center space-x-3 w-full md:w-auto">
                             <button id="actionsDropdownButton" data-dropdown-toggle="actionsDropdown"
+                                v-if="permission.canEditProduct"
                                 class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                                 type="button">
                                 <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
@@ -830,40 +465,55 @@ const deleteImage = async (eimage, index) => {
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
-                                <th scope="col" class="px-4 py-3">Employee name</th>
-                                <th scope="col" class="px-4 py-3">Phone</th>
-                                <th scope="col" class="px-4 py-3">Address</th>
-                                <th scope="col" class="px-4 py-3">Gender</th>
-                                <th scope="col" class="px-4 py-3">Age</th>
-                                <th scope="col" class="px-4 py-3">Image</th>
-                                <th scope="col" class="px-4 py-3">salary</th>
+                                <th scope="col" class="px-4 py-3">Product name</th>
+                                <th scope="col" class="px-4 py-3">Quantity</th>
+                                <th scope="col" class="px-4 py-3">Color</th>
+                                <th scope="col" class="px-4 py-3">Dinar</th>
+                                <th scope="col" class="px-4 py-3">Dolar</th>
+                                <th scope="col" class="px-4 py-3">Value</th>
+                                <th scope="col" class="px-4 py-3">Category</th>
+                                <th scope="col" class="px-4 py-3">Company</th>
+                                <th scope="col" class="px-4 py-3">Stock</th>
+                                <th scope="col" class="px-4 py-3">Status</th>
                                 <th scope="col" class="px-4 py-3">Actions</th>
 
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="employee in employees" :key="employee.id" class="border-b dark:border-gray-700">
+                            <tr v-for="product in products" :key="product.id" class="border-b dark:border-gray-700">
                                 <th scope="row"
                                     class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    {{ employee.name }}</th>
-                                <td class="px-4 py-3">{{ employee.formatted_phone }}</td>
-                                <td class="px-4 py-3">{{ employee.address }}</td>
-                                <td class="px-4 py-3">{{ parseInt(employee.gender) == 1 ? "Male" : 'Female' }} </td>
-                                <td class="px-4 py-3">{{ employee.age }}</td>
+                                    {{ product.name }}</th>
+                                <td class="px-4 py-3">{{ product.quantity }}</td>
+                                <td class="px-4 py-3">{{ product.color }}</td>
+                                <td class="px-4 py-3">{{ parseInt(product.dinar_price) }} IQD</td>
+                                <td class="px-4 py-3">{{ product.dolar_price }} $</td>
+                                <td class="px-4 py-3">{{ parseInt(product.dolar_data) }} IQD</td>
+                                <td class="px-4 py-3">{{ product.category.name }}</td>
+                                <td class="px-4 py-3">{{ product.company.name }}</td>
                                 <td class="px-4 py-3">
-                                    <div v-for="(image, index) in employee.employee_images">
+                                    <span v-if="product.inStock == 1"
+                                        class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">In
+                                        Stock</span>
 
-                                        <a class="text-blue-500" :href="image.image" target="_blank"> Image {{
-                                            (index + 1) }}</a>
-                                    </div>
+                                    <span v-else
+                                        class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">Out
+                                        Stock</span>
 
                                 </td>
-                                <td class="px-4 py-3">{{ employee.salary }} $</td>
+                                <td class="px-4 py-3">
+                                    <button v-if="product.published == 1" type="button"
+                                        class="px-3 py-2 text-xs font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Published</button>
+
+                                    <button v-else type="button"
+                                        class="px-3 py-2 text-xs font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">Not
+                                        Published</button>
 
 
+                                </td>
                                 <td class="px-4 py-3 flex items-center justify-end">
-                                    <button :id="employee.id + '-button'"
-                                        :data-dropdown-toggle="employee.id + '-dropdown'"
+                                    <button :id="product.id + '-button'"
+                                        :data-dropdown-toggle="product.id + '-dropdown'"
                                         class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
                                         type="button">
                                         <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20"
@@ -872,21 +522,21 @@ const deleteImage = async (eimage, index) => {
                                                 d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
                                         </svg>
                                     </button>
-                                    <div :id="employee.id + '-dropdown'"
+                                    <div :id="product.id + '-dropdown'" v-if="permission.canEditProduct"
                                         class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
                                         <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                                            :aria-labelledby="employee.id + '-dropdown'">
+                                            :aria-labelledby="product.id + '-dropdown'">
                                             <li>
                                                 <a href="#"
                                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Show</a>
                                             </li>
                                             <li>
-                                                <a @click="openEditModal(employee)" href="#"
+                                                <a @click="openEditModal(product)" href="#"
                                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</a>
                                             </li>
                                         </ul>
                                         <div class="py-1">
-                                            <a href="#" @click="deleteEmployee(employee, index)"
+                                            <a href="#" @click="deleteProduct(product, index)"
                                                 class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Delete</a>
                                         </div>
                                     </div>
@@ -902,7 +552,7 @@ const deleteImage = async (eimage, index) => {
                         Showing
                         <span class="font-semibold text-gray-900 dark:text-white">1-10</span>
                         of
-                        <span class="font-semibold text-gray-900 dark:text-white">{{ employees.length }}</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ products.length }}</span>
                     </span>
                     <ul class="inline-flex items-stretch -space-x-px">
                         <li>

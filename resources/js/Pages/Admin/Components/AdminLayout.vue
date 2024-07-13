@@ -33,4 +33,6 @@ import Sidebar from './Sidebar.vue'
 onMounted(() => {
     initFlowbite();
 })
+
+
 </script>

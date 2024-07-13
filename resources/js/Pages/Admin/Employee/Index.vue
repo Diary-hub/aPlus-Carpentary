@@ -1,6 +1,6 @@
 <template>
     <AdminLayout>
-        <EmployeeList :employees="employees" />
+        <EmployeeList :employees="employees" :users="users" />
     </AdminLayout>
 </template>
 
@@ -8,7 +8,8 @@
 
 defineProps({
 
-    employees: Array
+    employees: Array,
+    users: Array
 })
 
 import AdminLayout from '../Components/AdminLayout.vue';
