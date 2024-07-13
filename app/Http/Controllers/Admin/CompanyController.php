@@ -50,7 +50,7 @@ class CompanyController extends Controller
 
 
 
-        return redirect()->route('admin.companies.index')->with('success', 'Company Created Successfully');
+        return redirect()->back()->with('success', 'Company Created Successfully');
     }
 
     public function edit()
