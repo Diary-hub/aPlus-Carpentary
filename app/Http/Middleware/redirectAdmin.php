@@ -26,6 +26,6 @@ class redirectAdmin
             }
         }
 
-        return redirect()->route('dashboard')->with('error', "Access denied. You are not admin.");
+        return redirect()->route('user.dashboard')->with('error', "Access denied. You are not admin.");
     }
 }

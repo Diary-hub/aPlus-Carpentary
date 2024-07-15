@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Employee;
+namespace App\Http\Requests\Qyasat;
 
 use App\Models\PermessionModel;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class UpdateEmployeePermessionRequest extends FormRequest
+class StoreQyasatRequest extends FormRequest
 {
-
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -18,7 +17,7 @@ class UpdateEmployeePermessionRequest extends FormRequest
             $user = Auth::user();
             $permission = PermessionModel::where('user_id', $user->id)->first();
 
-            if ($permission && $permission->isAdmin != 1 && $permission->canEditEmployee != 1) {
+            if ($permission && $permission->isAdmin != 1 && $permission->canEditQyasat != 1) {
                 return false;
             }
         }
@@ -34,25 +33,20 @@ class UpdateEmployeePermessionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'canViewCategory' => 'required',
-            'isAdmin' => 'required',
-            'canViewProduct' => 'required',
-            'canViewCompany' => 'required',
-            'canEditProduct' => 'required',
-            'canEditCompany' => 'required',
-            'canEditCategory' => 'required',
-            'canAddProduct' => 'required',
-            'canViewEmployee' => 'required',
-            'canEditEmployee' => 'required',
-            'canViewQyasat' => 'required',
-            'canEditQyasat' => 'required',
+            'type' => 'required|string|max:200',
+            'customer_name' => 'required|string|max:200',
+            'customer_phone' => 'required|string|max:11',
+            'customer_address' => 'required|string|max:200',
+            'description' => 'nullable|string',
 
-            'user_id' => 'nullable|integer',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+
             'created_by' => 'nullable|integer',
+
             'updated_by' => 'nullable|integer',
             'deleted_by' => 'nullable|integer',
             'deleted_at' => 'nullable',
-
 
         ];
     }

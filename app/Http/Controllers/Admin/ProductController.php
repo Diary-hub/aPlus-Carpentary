@@ -40,7 +40,15 @@ class ProductController extends Controller
     public function supply()
     {
         $products = Product::with(['company', 'category'])->get();
-        return Inertia::render('Admin/Product/Supply/Index', ['products' => $products,]);
+
+        $user = User::with(['permission', 'employee'])->find(Auth::id());
+        $permission = $user->permission;
+        if ($permission->isAdmin === 1) {
+            return Inertia::render('Admin/Product/Supply/Index', ['permission' => $permission, 'products' => $products,]);
+        } else if ($permission->canAddProduct) {
+
+            return Inertia::render('User/Product/Supply/Index', ['permission' => $permission, 'products' => $products,]);
+        }
     }
 
     public function refill(SupplyProductRequest $request, $id)
@@ -50,7 +58,7 @@ class ProductController extends Controller
             $user = Auth::user();
             $permission = PermessionModel::where('user_id', $user->id)->first();
 
-            if ($permission && $permission->isAdmin != 1) {
+            if ($permission && $permission->isAdmin != 1 && $permission->canAddProduct != 1) {
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
         }

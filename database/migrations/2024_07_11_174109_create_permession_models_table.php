@@ -29,6 +29,8 @@ return new class extends Migration
             $table->boolean('canViewEmployee')->default(0);
             $table->boolean('canEditEmployee')->default(0);
 
+            $table->boolean('canViewQyasat')->default(0);
+            $table->boolean('canEditQyasat')->default(0);
 
             $table->foreignIdFor(User::class, 'user_id');
 

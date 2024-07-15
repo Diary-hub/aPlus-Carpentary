@@ -4,11 +4,12 @@ import { ref } from 'vue';
 import Swal from 'sweetalert2';
 import { watch } from 'vue';
 
-
-
-
 const props = defineProps({
-
+    permission: {
+        type: Object,
+        required: true,
+        default: () => ({})
+    },
     products: Array
 })
 

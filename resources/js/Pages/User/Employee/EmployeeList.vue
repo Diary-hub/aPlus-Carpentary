@@ -8,7 +8,11 @@ import { watch } from 'vue';
 
 
 const props = defineProps({
-
+    permission: {
+        type: Object,
+        required: true,
+        default: () => ({})
+    },
     employees: Array,
     users: Array
 })
@@ -59,11 +63,6 @@ const canAddProduct = ref('');
 const canViewEmployee = ref('');
 
 const canEditEmployee = ref('');
-
-
-const canViewQyasat = ref('');
-
-const canEditQyasat = ref('');
 
 
 
@@ -120,8 +119,6 @@ const resetDatas = () => {
     canAddProduct.value = '';
     canViewEmployee.value = '';
     canEditEmployee.value = '';
-    canViewQyasat.value = '';
-    canEditQyasat.value = '';
 
 
 
@@ -175,9 +172,6 @@ const openEditModal = (employee) => {
     canAddProduct.value = employee.user.permission.canAddProduct;
     canViewEmployee.value = employee.user.permission.canViewEmployee;
     canEditEmployee.value = employee.user.permission.canEditEmployee;
-
-    canViewQyasat.value = employee.user.permission.canViewQyasat;
-    canEditQyasat.value = employee.user.permission.canEditQyasat;
 
 }
 
@@ -272,9 +266,6 @@ const updateEmployee = async () => {
     formDataPermessions.append('canAddProduct', canAddProduct.value);
     formDataPermessions.append('canViewEmployee', canViewEmployee.value);
     formDataPermessions.append('canEditEmployee', canEditEmployee.value);
-
-    formDataPermessions.append('canViewQyasat', canViewQyasat.value);
-    formDataPermessions.append('canEditQyasat', canEditQyasat.value);
 
     formDataPermessions.append('_method', "PUT");
 
@@ -410,8 +401,7 @@ const deleteImage = async (eimage, index) => {
 
     try {
 
-
-        await router.delete('/admin/employees/image/' + eimage.id, {
+        await router.delete('employees/image/' + eimage.id, {
             onSuccess: (page) => {
                 employee_images.value.splice(index, 1);
                 Swal.fire({
@@ -701,32 +691,6 @@ const deleteImage = async (eimage, index) => {
                                 </select>
                             </div>
 
-
-
-                            <div>
-                                <label for="canViewQyasat"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">View
-                                    Qyasat</label>
-                                <select v-model="canViewQyasat" id="canViewQyasat"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canEditQyasat"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Edit
-                                    Qyasat</label>
-                                <select v-model="canEditQyasat" id="canEditQyasat"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
                         </div>
 
 
@@ -770,7 +734,7 @@ const deleteImage = async (eimage, index) => {
                     </div>
                     <div
                         class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                        <button type="button" @click="openAddModal"
+                        <button type="button" @click="openAddModal" v-if="permission.canEditEmployee"
                             class="flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primarbluey-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                             <svg class="h-3.5 w-3.5 mr-2" fill="currentColor" viewbox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -781,6 +745,7 @@ const deleteImage = async (eimage, index) => {
                         </button>
                         <div class="flex items-center space-x-3 w-full md:w-auto">
                             <button id="actionsDropdownButton" data-dropdown-toggle="actionsDropdown"
+                                v-if="permission.canEditEmployee"
                                 class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                                 type="button">
                                 <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
@@ -902,7 +867,7 @@ const deleteImage = async (eimage, index) => {
 
 
                                 <td class="px-4 py-3 flex items-center justify-end">
-                                    <button :id="employee.id + '-button'"
+                                    <button :id="employee.id + '-button'" v-if="permission.canEditEmployee"
                                         :data-dropdown-toggle="employee.id + '-dropdown'"
                                         class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
                                         type="button">

@@ -8,14 +8,17 @@ import { watch } from 'vue';
 
 
 const props = defineProps({
-
-    employees: Array,
-    users: Array
+    permission: {
+        type: Object,
+        required: true,
+        default: () => ({})
+    },
+    qyasat: Array,
 })
 
 
 
-const isAddEmployee = ref(false);
+const isAddQyasat = ref(false);
 const dialogVisible = ref(false);
 const editMode = ref(false);
 
@@ -24,54 +27,23 @@ const fileList = ref([]);
 
 
 const id = ref('');
-const user = ref('null');
-const name = ref('');
-const phone = ref('');
-const address = ref('');
-const type = ref('normal');
-const gender = ref('null');
-const age = ref('');
-const image = ref('');
-const salary = ref('');
+const type = ref('');
+const customer_name = ref('');
+const customer_address = ref('');
+const customer_phone = ref('');
 const description = ref('');
+const image = ref('');
 
-const employee_images = ref([]);
-const employeeImages = ref([]);
+const qyasat_images = ref([]);
+const qyasatImages = ref([]);
 
 const dialogImageUrl = ref('');
-
-
-const isAdmin = ref('');
-
-
-
-
-const canViewProduct = ref('');
-const canViewCompany = ref('');
-const canViewCategory = ref('');
-
-const canEditProduct = ref('');
-const canEditCompany = ref('');
-const canEditCategory = ref('');
-
-const canAddProduct = ref('');
-
-const canViewEmployee = ref('');
-
-const canEditEmployee = ref('');
-
-
-const canViewQyasat = ref('');
-
-const canEditQyasat = ref('');
-
-
 
 
 
 
 const handleFileChange = (file) => {
-    employeeImages.value.push(file);
+    qyasatImages.value.push(file);
 }
 
 
@@ -95,40 +67,27 @@ const handleRemove = (file) => {
 const resetDatas = () => {
 
     id.value = '';
-    user.value = 'null';
-    type.value = 'normal';
-    name.value = '';
-    phone.value = '';
-    address.value = '';
-    gender.value = 'null';
-    age.value = '';
+    type.value = '';
+
+    customer_name.value = '';
+    customer_address.value = '';
+    customer_phone.value = '';
+
     image.value = '';
-    salary.value = '';
     description.value = '';
+
+
     dialogImageUrl.value = '';
-    employee_images.value = '';
-    employeeImages.value = '';
+    qyasat_images.value = '';
+    qyasatImages.value = '';
 
-
-    isAdmin.value = '';
-    canViewProduct.value = '';
-    canViewCompany.value = '';
-    canViewCategory.value = '';
-    canEditProduct.value = '';
-    canEditCompany.value = '';
-    canEditCategory.value = '';
-    canAddProduct.value = '';
-    canViewEmployee.value = '';
-    canEditEmployee.value = '';
-    canViewQyasat.value = '';
-    canEditQyasat.value = '';
 
 
 
 }
 
 const openAddModal = () => {
-    isAddEmployee.value = true;
+    isAddQyasat.value = true;
     dialogVisible.value = true;
     editMode.value = false;
     resetDatas();
@@ -143,41 +102,29 @@ const openAddModal = () => {
 
 
 
-const openEditModal = (employee) => {
-    isAddEmployee.value = false;
+const openEditModal = (qyas) => {
+    isAddQyasat.value = false;
     editMode.value = true;
     dialogVisible.value = true;
 
 
-    // Update the data based on the selected employee
-    id.value = employee.id;
-    user.value = employee.user_id;
-    name.value = employee.name;
-    phone.value = employee.phone;
-    type.value = employee.type;
-    address.value = employee.address;
-    gender.value = employee.gender;
-    age.value = employee.age;
-    image.value = employee.image;
-    salary.value = employee.salary;
-    description.value = employee.description;
-    employee_images.value = employee.employee_images;
+    // Update the data based on the selected qyas
+    id.value = qyas.id;
+    type.value = qyas.type;
+    customer_name.value = qyas.customer_name;
+    customer_address.value = qyas.customer_address;
+    customer_phone.value = qyas.customer_phone;
+    image.value = qyas.image;
+    description.value = qyas.description;
+    qyasat_images.value = qyas.qyasat_files;
 
 
 
-    isAdmin.value = employee.user.permission.isAdmin;
-    canViewProduct.value = employee.user.permission.canViewProduct;
-    canViewCompany.value = employee.user.permission.canViewCompany;
-    canViewCategory.value = employee.user.permission.canViewCategory;
-    canEditProduct.value = employee.user.permission.canEditProduct;
-    canEditCompany.value = employee.user.permission.canEditCompany;
-    canEditCategory.value = employee.user.permission.canEditCategory;
-    canAddProduct.value = employee.user.permission.canAddProduct;
-    canViewEmployee.value = employee.user.permission.canViewEmployee;
-    canEditEmployee.value = employee.user.permission.canEditEmployee;
 
-    canViewQyasat.value = employee.user.permission.canViewQyasat;
-    canEditQyasat.value = employee.user.permission.canEditQyasat;
+
+
+
+
 
 }
 
@@ -185,27 +132,23 @@ const openEditModal = (employee) => {
 
 
 
-const addEmployee = async () => {
+const addQyasat = async () => {
     const formData = new FormData();
-    formData.append('name', name.value);
-    formData.append('phone', phone.value);
-    formData.append('address', address.value);
-    formData.append('gender', gender.value);
-    formData.append('age', age.value);
+    formData.append('customer_name', customer_name.value);
+    formData.append('customer_address', customer_address.value);
+    formData.append('customer_phone', customer_phone.value);
     formData.append('image', image.value);
-    formData.append('salary', salary.value);
     formData.append('description', description.value);
-    formData.append('user_id', user.value);
     formData.append('type', type.value);
 
 
-    for (const image of employeeImages.value) {
-        formData.append('employee_images[]', image.raw)
+    for (const image of qyasatImages.value) {
+        formData.append('qyasat_images[]', image.raw)
     }
 
 
     try {
-        await router.post('employees/store', formData, {
+        await router.post('qyasat/store', formData, {
             onSuccess: page => {
                 Swal.fire({
                     toast: true,
@@ -244,50 +187,28 @@ const addEmployee = async () => {
 
 
 
-const updateEmployee = async () => {
+const updateQyasat = async () => {
     const formData = new FormData();
-    formData.append('name', name.value);
-    formData.append('phone', phone.value);
-    formData.append('address', address.value);
-    formData.append('gender', gender.value);
-    formData.append('age', age.value);
+    formData.append('customer_name', customer_name.value);
+    formData.append('customer_address', customer_address.value);
+    formData.append('customer_phone', customer_phone.value);
     formData.append('image', image.value);
-    formData.append('salary', salary.value);
     formData.append('description', description.value);
-    formData.append('user_id', user.value);
     formData.append('type', type.value);
 
     formData.append('_method', "PUT");
 
 
 
-    const formDataPermessions = new FormData();
-    formDataPermessions.append('isAdmin', isAdmin.value);
-    formDataPermessions.append('canViewProduct', canViewProduct.value);
-    formDataPermessions.append('canViewCompany', canViewCompany.value);
-    formDataPermessions.append('canViewCategory', canViewCategory.value);
-    formDataPermessions.append('canEditProduct', canEditProduct.value);
-    formDataPermessions.append('canEditCompany', canEditCompany.value);
-    formDataPermessions.append('canEditCategory', canEditCategory.value);
-    formDataPermessions.append('canAddProduct', canAddProduct.value);
-    formDataPermessions.append('canViewEmployee', canViewEmployee.value);
-    formDataPermessions.append('canEditEmployee', canEditEmployee.value);
-
-    formDataPermessions.append('canViewQyasat', canViewQyasat.value);
-    formDataPermessions.append('canEditQyasat', canEditQyasat.value);
-
-    formDataPermessions.append('_method', "PUT");
 
 
 
-
-
-    for (const image of employeeImages.value) {
-        formData.append('employee_images[]', image.raw)
+    for (const image of qyasatImages.value) {
+        formData.append('qyasat_images[]', image.raw)
     }
 
     try {
-        await router.post('employees/update/' + id.value, formData, {
+        await router.post('qyasat/update/' + id.value, formData, {
             onSuccess: page => {
                 Swal.fire({
                     toast: true,
@@ -317,30 +238,7 @@ const updateEmployee = async () => {
 
 
 
-        await router.post('employees/permession/update/' + user.value, formDataPermessions, {
-            onSuccess: page => {
-                Swal.fire({
-                    toast: true,
-                    icon: 'success',
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 2000,
-                    title: page.props.flash.success
-                })
 
-                dialogVisible.value = false;
-                resetDatas();
-
-
-
-
-            },
-            onError: error => {
-                console.log(error);
-            }
-
-
-        })
 
 
     } catch (error) {
@@ -353,7 +251,7 @@ const updateEmployee = async () => {
 }
 
 
-const deleteEmployee = (employee, index) => {
+const deleteQyasat = (qyas, index) => {
 
     Swal.fire({
 
@@ -369,10 +267,10 @@ const deleteEmployee = (employee, index) => {
     }).then((result) => {
         if (result.isConfirmed) {
             try {
-                router.delete('employees/destroy/' + employee.id, {
+                router.delete('qyasat/destroy/' + qyas.id, {
                     onSuccess: (page) => {
 
-                        this.delete(employee, index);
+                        this.delete(qyas, index);
 
 
                         Swal.fire({
@@ -410,10 +308,9 @@ const deleteImage = async (eimage, index) => {
 
     try {
 
-
-        await router.delete('/admin/employees/image/' + eimage.id, {
+        await router.delete('qyasat/image/' + eimage.id, {
             onSuccess: (page) => {
-                employee_images.value.splice(index, 1);
+                qyasat_images.value.splice(index, 1);
                 Swal.fire({
                     toast: true,
                     icon: 'success',
@@ -448,88 +345,43 @@ const deleteImage = async (eimage, index) => {
         <el-dialog v-model="dialogVisible" width="500" :before-close="handleClose" style="border-radius: 2%">
             <section class=" bg-white dark:bg-gray-900">
                 <div class="py-8 px-4 mx-auto max-w-2xl ">
-                    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ editMode ? 'Edit Employee' :
-                        'Add Employee' }}</h2>
-                    <form @submit.prevent=" editMode ? updateEmployee() : addEmployee()">
+                    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ editMode ? 'Edit Qyas' :
+                        'Add Qyas' }}</h2>
+                    <form @submit.prevent=" editMode ? updateQyasat() : addQyasat()">
                         <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
 
-                            <div>
-                                <label for="user"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">User</label>
-                                <select v-model="user" id="user"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="null" value="null" selected disabled>
-                                        Select User </option>
-
-                                    <option v-for="user in users" :key="user.id" :value="user.id">
-                                        {{ user.name }}</option>
-
-                                </select>
-                            </div>
-                            <div>
+                            <div class="sm:col-span-2">
                                 <label for="type"
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Type</label>
-                                <select v-model="type" id="type"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-
-
-                                    <option key="normal" value="normal" selected>
-                                        Normal</option>
-
-                                    <option key="wasta" value="wasta" selected>
-                                        Wasta</option>
-
-                                </select>
+                                <input v-model="type" type="text" name="type" id="type"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="Type of Work" required="">
                             </div>
+
                             <div class="sm:col-span-2">
-                                <label for="name"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Employee
+                                <label for="customer_name"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Customer
                                     Name</label>
-                                <input v-model="name" type="text" name="name" id="name"
+                                <input v-model="customer_name" type="text" name="customer_name" id="customer_name"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Type Employee Name" required="">
-                            </div>
-                            <div class="w-full">
-                                <label for="phone"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
-                                <input v-model="phone" type="text" name="phone" id="phone"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Employee Phone" required="">
-                            </div>
-                            <div class="w-full">
-                                <label for="age"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Age</label>
-                                <input v-model="age" type="number" name="age" id="age"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Employee Age" required>
+                                    placeholder="Type Customer Name" required="">
                             </div>
                             <div class="sm:col-span-2">
-                                <label for="address"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
-                                <input v-model.number="address" type="text" name="address" id="address"
+                                <label for="customer_phone"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Customer
+                                    Phone</label>
+                                <input v-model="customer_phone" type="text" name="customer_phone" id="customer_phone"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Employee Address" required>
+                                    placeholder="Customer Phone" required="">
                             </div>
-                            <div class="w-full">
-                                <label for="salary"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Salary</label>
-                                <input v-model.number="salary" type="text" name="salary" id="salary"
+                            <div class="sm:col-span-2">
+                                <label for="customer_address"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Customer
+                                    Address</label>
+                                <input v-model.number="customer_address" type="text" name="customer_address"
+                                    id="customer_address"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Employee Salary" required>
-                            </div>
-                            <div>
-                                <label for="gender"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Gender</label>
-                                <select v-model="gender" id="gender"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="null" value="null" selected disabled>
-                                        Select Gender </option>
-                                    <option key="1" value="1">
-                                        Male </option>
-                                    <option key="2" value="2">
-                                        Female </option>
-
-                                </select>
+                                    placeholder="Customer Address" required>
                             </div>
 
                             <div class="sm:col-span-2">
@@ -545,11 +397,16 @@ const deleteImage = async (eimage, index) => {
 
                         <div class="grid md:gap-6">
                             <div class="relative z-0 w-full mb-6 group">
-                                <el-upload v-model:file-list="employeeImages" multiple list-type="picture-card"
+                                <el-upload v-model:file-list="qyasatImages" multiple list-type="picture-card"
                                     :on-preview="handlePictureCardPreview" :on-remove="handleRemove"
                                     :on-change="handleFileChange">
                                     <el-icon>
-                                        <Plus />
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M12 4.5v15m7.5-7.5h-15" />
+                                        </svg>
+
                                     </el-icon>
                                 </el-upload>
 
@@ -563,7 +420,7 @@ const deleteImage = async (eimage, index) => {
 
                         <div class="flex flex-nowrap mb-8 gap-1">
 
-                            <div v-for="(eimage, index) in employee_images" class="relative w-32 h-32 ">
+                            <div v-for="(eimage, index) in qyasat_images" class="relative w-32 h-32 ">
                                 <img class=" w-32 h-32 rounded" :src="eimage.image" alt="">
                                 <span
                                     class="absolute top-2 right-0 transform -translate-y-1/2 w-3.5 h-3.5 bg-red-400     border-2 border-white dark:border-gray-800 rounded-full">
@@ -573,165 +430,9 @@ const deleteImage = async (eimage, index) => {
                             </div>
                         </div>
 
-                        <br>
-
-                        <div class="flex flex-wrap mb-8 gap-8" v-if="editMode">
-
-                            <div>
-                                <label for="isAdmin"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Admin</label>
-                                <select v-model="isAdmin" id="isAdmin"
-                                    class=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
 
 
 
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canViewProduct"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">View
-                                    Product</label>
-                                <select v-model="canViewProduct" id="canViewProduct"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canViewCompany"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">View
-                                    Company</label>
-                                <select v-model="canViewCompany" id="canViewCompany"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canViewCategory"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">View
-                                    Category</label>
-                                <select v-model="canViewCategory" id="canViewCategory"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canEditProduct"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Edit
-                                    Product</label>
-                                <select v-model="canEditProduct" id="canEditProduct"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canEditCompany"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Edit
-                                    Company</label>
-                                <select v-model="canEditCompany" id="canEditCompany"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-
-                            <div>
-                                <label for="canEditCategory"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Edit
-                                    Category</label>
-                                <select v-model="canEditCategory" id="canEditCategory"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-
-                            <div>
-                                <label for="canAddProduct"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Add
-                                    Product</label>
-                                <select v-model="canAddProduct" id="canAddProduct"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-
-                            <div>
-                                <label for="canViewEmployee"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">View
-                                    Employee</label>
-                                <select v-model="canViewEmployee" id="canViewEmployee"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canEditEmployee"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Edit
-                                    Employee</label>
-                                <select v-model="canEditEmployee" id="canEditEmployee"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-
-
-                            <div>
-                                <label for="canViewQyasat"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">View
-                                    Qyasat</label>
-                                <select v-model="canViewQyasat" id="canViewQyasat"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="canEditQyasat"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Edit
-                                    Qyasat</label>
-                                <select v-model="canEditQyasat" id="canEditQyasat"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option key="0" value="0">No</option>
-                                    <option key="1" value="1">Yes</option>
-
-                                </select>
-                            </div>
-
-                        </div>
-
-
-
-                        <br>
                         <button type="submit"
                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">{{
                                 editMode ? 'Edit' : 'Add' }}</button>
@@ -770,17 +471,18 @@ const deleteImage = async (eimage, index) => {
                     </div>
                     <div
                         class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                        <button type="button" @click="openAddModal"
+                        <button type="button" @click="openAddModal" v-if="permission.canEditQyasat"
                             class="flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primarbluey-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                             <svg class="h-3.5 w-3.5 mr-2" fill="currentColor" viewbox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path clip-rule="evenodd" fill-rule="evenodd"
                                     d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
                             </svg>
-                            Add employee
+                            Add Qyas
                         </button>
                         <div class="flex items-center space-x-3 w-full md:w-auto">
                             <button id="actionsDropdownButton" data-dropdown-toggle="actionsDropdown"
+                                v-if="permission.canEditQyasat"
                                 class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                                 type="button">
                                 <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
@@ -870,40 +572,36 @@ const deleteImage = async (eimage, index) => {
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
-                                <th scope="col" class="px-4 py-3">Employee name</th>
-                                <th scope="col" class="px-4 py-3">Phone</th>
-                                <th scope="col" class="px-4 py-3">Address</th>
-                                <th scope="col" class="px-4 py-3">Gender</th>
-                                <th scope="col" class="px-4 py-3">Age</th>
-                                <th scope="col" class="px-4 py-3">Image</th>
-                                <th scope="col" class="px-4 py-3">salary</th>
+                                <th scope="col" class="px-4 py-3">Customer name</th>
+                                <th scope="col" class="px-4 py-3">Customer Phone</th>
+                                <th scope="col" class="px-4 py-3">Customer Address</th>
+                                <th scope="col" class="px-4 py-3">Work Type</th>
+                                <th scope="col" class="px-4 py-3">Image/File</th>
                                 <th scope="col" class="px-4 py-3">Actions</th>
 
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="employee in employees" :key="employee.id" class="border-b dark:border-gray-700">
+                            <tr v-for="qyas in qyasat" :key="qyas.id" class="border-b dark:border-gray-700">
                                 <th scope="row"
                                     class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    {{ employee.name }}</th>
-                                <td class="px-4 py-3">{{ employee.formatted_phone }}</td>
-                                <td class="px-4 py-3">{{ employee.address }}</td>
-                                <td class="px-4 py-3">{{ parseInt(employee.gender) == 1 ? "Male" : 'Female' }} </td>
-                                <td class="px-4 py-3">{{ employee.age }}</td>
+                                    {{ qyas.customer_name }}</th>
+                                <td class="px-4 py-3">{{ qyas.formatted_phone }}</td>
+                                <td class="px-4 py-3">{{ qyas.customer_address }}</td>
+                                <td class="px-4 py-3">{{ qyas.type }} </td>
                                 <td class="px-4 py-3">
-                                    <div v-for="(image, index) in employee.employee_images">
+                                    <div v-for="(image, index) in qyas.qyasat_files">
 
-                                        <a class="text-blue-500" :href="image.image" target="_blank"> Image {{
+                                        <a class="text-blue-500" :href="image.image" target="_blank"> File {{
                                             (index + 1) }}</a>
                                     </div>
 
                                 </td>
-                                <td class="px-4 py-3">{{ employee.salary }} $</td>
 
 
                                 <td class="px-4 py-3 flex items-center justify-end">
-                                    <button :id="employee.id + '-button'"
-                                        :data-dropdown-toggle="employee.id + '-dropdown'"
+                                    <button :id="qyas.id + '-button'" :data-dropdown-toggle="qyas.id + '-dropdown'"
+                                        v-if="permission.canEditQyasat"
                                         class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
                                         type="button">
                                         <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20"
@@ -912,21 +610,21 @@ const deleteImage = async (eimage, index) => {
                                                 d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
                                         </svg>
                                     </button>
-                                    <div :id="employee.id + '-dropdown'"
+                                    <div :id="qyas.id + '-dropdown'"
                                         class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
                                         <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                                            :aria-labelledby="employee.id + '-dropdown'">
+                                            :aria-labelledby="qyas.id + '-dropdown'">
                                             <li>
                                                 <a href="#"
                                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Show</a>
                                             </li>
                                             <li>
-                                                <a @click="openEditModal(employee)" href="#"
+                                                <a @click="openEditModal(qyas)" href="#"
                                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</a>
                                             </li>
                                         </ul>
                                         <div class="py-1">
-                                            <a href="#" @click="deleteEmployee(employee, index)"
+                                            <a href="#" @click="deleteQyasat(qyas, index)"
                                                 class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Delete</a>
                                         </div>
                                     </div>
@@ -942,7 +640,7 @@ const deleteImage = async (eimage, index) => {
                         Showing
                         <span class="font-semibold text-gray-900 dark:text-white">1-10</span>
                         of
-                        <span class="font-semibold text-gray-900 dark:text-white">{{ employees.length }}</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ qyasat.length }}</span>
                     </span>
                     <ul class="inline-flex items-stretch -space-x-px">
                         <li>

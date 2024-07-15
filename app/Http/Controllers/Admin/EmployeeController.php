@@ -19,13 +19,18 @@ use Inertia\Inertia;
 
 class EmployeeController extends Controller
 {
-
-
     public function index()
     {
         $employees = Employee::with(['employee_images', 'user.permission'])->get();
         $users = User::get();
-        return Inertia::render('Admin/Employee/Index', ['employees' => $employees, 'users' => $users]);
+        $user = User::with(['permission', 'employee'])->find(Auth::id());
+        $permission = $user->permission;
+
+        if ($permission->isAdmin === 1) {
+            return Inertia::render('Admin/Employee/Index', ['permission' => $permission, 'employees' => $employees, 'users' => $users]);
+        } else if ($permission->canViewEmployee) {
+            return Inertia::render('User/Employee/Index', ['permission' => $permission, 'employees' => $employees, 'users' => $users]);
+        }
     }
 
     public function store(StoreEmployeeRequest $request)
@@ -35,7 +40,7 @@ class EmployeeController extends Controller
             $user = Auth::user();
             $permission = PermessionModel::where('user_id', $user->id)->first();
 
-            if ($permission && $permission->isAdmin != 1) {
+            if ($permission && $permission->isAdmin != 1 && $permission->canEditEmployee != 1) {
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
         }
@@ -78,7 +83,7 @@ class EmployeeController extends Controller
 
 
 
-        return redirect()->route('admin.employees.index')->with('success', 'Employee Created Successfully');
+        return redirect()->back()->with('success', 'Employee Created Successfully');
     }
 
     public function edit()
@@ -86,6 +91,16 @@ class EmployeeController extends Controller
     }
     public function update(UpdateEmployeeRequest $request, $id)
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+            $permission = PermessionModel::where('user_id', $user->id)->first();
+
+            if ($permission && $permission->isAdmin != 1 && $permission->canEditEmployee != 1) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+        }
+
+
         $employee = Employee::findOrFail($id);
 
         // Update the employee with validated data
@@ -141,6 +156,8 @@ class EmployeeController extends Controller
         $employeePermessions->canAddProduct = $request->canAddProduct;
         $employeePermessions->canViewEmployee = $request->canViewEmployee;
         $employeePermessions->canEditEmployee = $request->canEditEmployee;
+        $employeePermessions->canViewQyasat = $request->canViewQyasat;
+        $employeePermessions->canEditQyasat = $request->canEditQyasat;
 
 
 
@@ -158,13 +175,13 @@ class EmployeeController extends Controller
     {
         $image = EmployeeImage::where('id', $id)->delete();
 
-        return redirect()->route('admin.employees.index')->with('success', 'Image Deleted Successfully');
+        return redirect()->back()->with('success', 'Image Deleted Successfully');
     }
 
     public function destroy($id)
     {
         $employee = Employee::findOrFail($id);
         $employee->delete();
-        return redirect()->route('admin.employees.index')->with('success', 'Employee Deleted Successfully');
+        return redirect()->back()->with('success', 'Employee Deleted Successfully');
     }
 }

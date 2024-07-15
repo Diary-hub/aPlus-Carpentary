@@ -121,7 +121,7 @@ import { Link } from '@inertiajs/vue3';
                 </li>
 
                 <li>
-                    <Link :href="route('admin.employees.index')"
+                    <Link :href="route('admin.qyasat.index')"
                         class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6">
@@ -131,7 +131,7 @@ import { Link } from '@inertiajs/vue3';
 
 
 
-                    <span class="ml-3">Orders</span>
+                    <span class="ml-3">Qyasat</span>
                     </Link>
                 </li>
 

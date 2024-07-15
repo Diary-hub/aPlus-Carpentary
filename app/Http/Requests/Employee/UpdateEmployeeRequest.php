@@ -17,8 +17,8 @@ class UpdateEmployeeRequest extends FormRequest
             $user = Auth::user();
             $permission = PermessionModel::where('user_id', $user->id)->first();
 
-            if ($permission && $permission->isAdmin != 1) {
-                return response()->json(['message' => 'Unauthorized'], 403);
+            if ($permission && $permission->isAdmin != 1 && $permission->canEditEmployee != 1) {
+                return false;
             }
         }
 

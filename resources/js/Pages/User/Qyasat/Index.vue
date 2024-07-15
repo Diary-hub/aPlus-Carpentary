@@ -1,6 +1,6 @@
 <template>
     <UserLayout>
-        <AddForm :products="products" :permission="permission" />
+        <QyasatList :qyasat="qyasat" :permission="permission" />
     </UserLayout>
 </template>
 
@@ -12,9 +12,10 @@ defineProps({
         required: true,
         default: () => ({})
     },
-    products: Array
+    qyasat: Array,
+
 })
 
-import UserLayout from '../../../Components/UserLayout.vue';
-import AddForm from './AddForm.vue'
+import UserLayout from '../../Components/UserLayout.vue';
+import QyasatList from "./QyasatList.vue";
 </script>
