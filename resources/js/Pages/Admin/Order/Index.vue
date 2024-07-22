@@ -1,17 +1,16 @@
 <template>
     <AdminLayout>
-        <QyasatList :qyasat="qyasat" :employee="employee" />
+        <OrderList :orders="orders" />
     </AdminLayout>
 </template>
 
 <script setup>
 
 defineProps({
-    employee: Array,
-    qyasat: Array,
+    orders: Array,
 
 })
 
 import AdminLayout from '../Components/AdminLayout.vue';
-import QyasatList from "././QyasatList.vue";
+import OrderList from "./OrderList.vue";
 </script>

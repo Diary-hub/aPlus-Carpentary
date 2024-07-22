@@ -25,6 +25,8 @@ class PermessionModel extends Model
         'canEditEmployee',
         'canViewQyasat',
         'canEditQyasat',
+        'canViewOrder',
+        'canEditOrder',
         'user_id',
         'created_by',
         'updated_by',

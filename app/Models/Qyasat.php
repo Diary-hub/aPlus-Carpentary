@@ -30,6 +30,10 @@ class Qyasat extends Model
     {
         return $this->hasMany(QyasatImage::class);
     }
+    public function order_detail()
+    {
+        return $this->hasOne(OrderDetail::class);
+    }
 
 
     public function getFormattedPhoneAttribute()

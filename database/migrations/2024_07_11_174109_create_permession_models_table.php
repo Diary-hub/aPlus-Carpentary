@@ -32,6 +32,9 @@ return new class extends Migration
             $table->boolean('canViewQyasat')->default(0);
             $table->boolean('canEditQyasat')->default(0);
 
+            $table->boolean('canViewOrder')->default(0);
+            $table->boolean('canEditOrder')->default(0);
+
             $table->foreignIdFor(User::class, 'user_id');
 
             $table->foreignIdFor(User::class, 'created_by')->nullable();

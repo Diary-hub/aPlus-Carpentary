@@ -6,31 +6,33 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Order extends Model
+class OrderDetail extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
     protected $fillable = [
+        'qyasat_id',
         'employee_id',
-        'qyas_id',
-        'order_detail_id',
-        'start_date',
-        'end_date',
-        'house_date',
-        'items',
-        'isDone',
-        'isSumbited',
+        'color',
+        'price',
+        'resource_type',
+        'description',
+        'price_meter',
+        'meter',
+        'total_meter_price',
+
+
         'created_by',
         'updated_by',
         'deleted_by',
-        'deleted_at',
+        'deleted_at'
     ];
 
 
-    public function employee()
+    public function order_detail_files()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->hasMany(OrderDetailImage::class);
     }
 
 
@@ -39,8 +41,8 @@ class Order extends Model
         return $this->belongsTo(Qyasat::class);
     }
 
-    public function order_files()
+    public function employee()
     {
-        return $this->hasMany(OrderImage::class);
+        return $this->belongsTo(Employee::class);
     }
 }

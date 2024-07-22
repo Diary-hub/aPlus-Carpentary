@@ -57,14 +57,14 @@ const canEditCategory = ref('');
 const canAddProduct = ref('');
 
 const canViewEmployee = ref('');
-
 const canEditEmployee = ref('');
 
 
 const canViewQyasat = ref('');
-
 const canEditQyasat = ref('');
 
+const canViewOrder = ref('');
+const canEditOrder = ref('');
 
 
 
@@ -122,6 +122,8 @@ const resetDatas = () => {
     canEditEmployee.value = '';
     canViewQyasat.value = '';
     canEditQyasat.value = '';
+    canViewOrder.value = '';
+    canEditOrder.value = '';
 
 
 
@@ -178,6 +180,9 @@ const openEditModal = (employee) => {
 
     canViewQyasat.value = employee.user.permission.canViewQyasat;
     canEditQyasat.value = employee.user.permission.canEditQyasat;
+
+    canViewOrder.value = employee.user.permission.canViewOrder;
+    canEditOrder.value = employee.user.permission.canEditOrder;
 
 }
 
@@ -275,6 +280,9 @@ const updateEmployee = async () => {
 
     formDataPermessions.append('canViewQyasat', canViewQyasat.value);
     formDataPermessions.append('canEditQyasat', canEditQyasat.value);
+
+    formDataPermessions.append('canViewOrder', canViewOrder.value);
+    formDataPermessions.append('canEditOrder', canEditOrder.value);
 
     formDataPermessions.append('_method', "PUT");
 
@@ -720,6 +728,30 @@ const deleteImage = async (eimage, index) => {
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Edit
                                     Qyasat</label>
                                 <select v-model="canEditQyasat" id="canEditQyasat"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                    <option key="0" value="0">No</option>
+                                    <option key="1" value="1">Yes</option>
+
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="canViewOrder"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">View
+                                    Order</label>
+                                <select v-model="canViewOrder" id="canViewOrder"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                    <option key="0" value="0">No</option>
+                                    <option key="1" value="1">Yes</option>
+
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="canEditOrder"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Edit
+                                    Order</label>
+                                <select v-model="canEditOrder" id="canEditOrder"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                                     <option key="0" value="0">No</option>
                                     <option key="1" value="1">Yes</option>

@@ -1,6 +1,6 @@
 <template>
     <UserLayout>
-        <QyasatList :qyasat="qyasat" :permission="permission" :employee="employee" />
+        <OrderList :orders="orders" :permission="permission" />
     </UserLayout>
 </template>
 
@@ -12,11 +12,10 @@ defineProps({
         required: true,
         default: () => ({})
     },
-    qyasat: Array,
-    employee: Array,
+    orders: Array,
 
 })
 
 import UserLayout from '../../Components/UserLayout.vue';
-import QyasatList from "./QyasatList.vue";
+import OrderList from "./OrderList.vue";
 </script>

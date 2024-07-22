@@ -13,13 +13,11 @@ const props = defineProps({
         required: true,
         default: () => ({})
     },
-    employee: Array,
-    qyasat: Array,
+    orders: Array,
 })
 
 
-
-const isAddQyasat = ref(false);
+const isAddOrder = ref(false);
 const dialogVisible = ref(false);
 const editMode = ref(false);
 
@@ -28,77 +26,44 @@ const fileList = ref([]);
 
 
 const id = ref('');
-const type = ref('');
-const customer_name = ref('');
-const customer_address = ref('');
-const customer_phone = ref('');
-const description = ref('');
-const image = ref('');
-const inOrder = ref('');
-
-
-
-
-const qyasat_images = ref([]);
-const qyasatImages = ref([]);
-
-const dialogImageUrl = ref('');
-
-
-// Order Variables
-
-
-const isAddOrder = ref(false);
-const orderDialogVisible = ref(false);
-
-
+const employee_id = ref('');
 const qyas_id = ref('');
-const order_id = ref('');
-const order_color = ref('');
-const order_price = ref('');
-const order_resource = ref('');
+
+const start_date = ref('');
+const end_date = ref('');
+const house_date = ref('');
+
+
+
+const isDone = ref('');
+const isSumbited = ref('');
+
+
+
+
+
 
 const order_images = ref([]);
 const orderImages = ref([]);
 
-const orderDialogImageUrl = ref('');
-
-const order_employee = ref('');
-const order_employee_price_meter = ref('');
-const order_meter = ref('');
-const order_employee_price_total = ref('');
-
-
-watch([order_employee_price_meter, order_meter], () => {
-    order_employee_price_total.value = order_employee_price_meter.value * order_meter.value;
-});
+const DialogImageUrl = ref('');
 
 
 
 
 
-
-const handleFileChangeOrder = (file) => {
-    orderImages.value.push(file);
-}
-
-
-const handlePictureCardPreviewOrder = (file) => {
-    orderDialogImageUrl.value = file.url;
-    orderDialogVisible.value = true;
-}
 
 
 
 
 
 const handleFileChange = (file) => {
-    qyasatImages.value.push(file);
+    orderImages.value.push(file);
 }
 
 
 const handlePictureCardPreview = (file) => {
-    dialogImageUrl.value = file.url;
+    DialogImageUrl.value = file.url;
     dialogVisible.value = true;
 }
 
@@ -117,38 +82,22 @@ const handleRemove = (file) => {
 const resetDatas = () => {
 
     id.value = '';
-    type.value = '';
+    employee_id.value = '';
+    qyas_id.value = '';
 
-    customer_name.value = '';
-    customer_address.value = '';
-    customer_phone.value = '';
 
-    image.value = '';
-    description.value = '';
-
+    isDone.value = '';
+    isSumbited.value = '';
+    start_date.value = '';
+    end_date.value = '';
+    house_date.value = '';
 
     dialogImageUrl.value = '';
-    qyasat_images.value = '';
-    qyasatImages.value = '';
-
-    inOrder.value = '';
-
-
-
-    qyas_id.value = '';
-    order_id.value = '';
-    order_color.value = '';
-    order_price.value = '';
-    order_resource.value = '';
     order_images.value = '';
     orderImages.value = '';
 
-    orderDialogImageUrl.value = '';
 
-    order_employee.value = '';
-    order_employee_price_meter.value = '';
-    order_meter.value = '';
-    order_employee_price_total.value = '';
+
 
 
 
@@ -157,9 +106,10 @@ const resetDatas = () => {
 }
 
 const openAddModal = () => {
-    isAddQyasat.value = true;
+    isAddOrder.value = true;
     dialogVisible.value = true;
     editMode.value = false;
+
     resetDatas();
 
 
@@ -172,23 +122,23 @@ const openAddModal = () => {
 
 
 
-const openEditModal = (qyas) => {
-    isAddQyasat.value = false;
+const openEditModal = (order) => {
+    isAddOrder.value = false;
     editMode.value = true;
     dialogVisible.value = true;
 
 
-    // Update the data based on the selected qyas
-    id.value = qyas.id;
+    // Update the data based on the selected order
+    id.value = order.id;
 
-    type.value = qyas.type;
-    customer_name.value = qyas.customer_name;
-    customer_address.value = qyas.customer_address;
-    customer_phone.value = qyas.customer_phone;
-    image.value = qyas.image;
-    description.value = qyas.description;
-    qyasat_images.value = qyas.qyasat_files;
-    inOrder.value = qyas.inOrder;
+    type.value = order.type;
+    customer_name.value = order.customer_name;
+    customer_address.value = order.customer_address;
+    customer_phone.value = order.customer_phone;
+    image.value = order.image;
+    description.value = order.description;
+    order_images.value = order.order_files;
+    inOrder.value = order.inOrder;
 
 
 
@@ -204,7 +154,7 @@ const openEditModal = (qyas) => {
 
 
 
-const addQyasat = async () => {
+const addOrder = async () => {
     const formData = new FormData();
     formData.append('customer_name', customer_name.value);
     formData.append('customer_address', customer_address.value);
@@ -215,13 +165,13 @@ const addQyasat = async () => {
     formData.append('inOrder', inOrder.value);
 
 
-    for (const image of qyasatImages.value) {
-        formData.append('qyasat_images[]', image.raw)
+    for (const image of orderImages.value) {
+        formData.append('order_images[]', image.raw)
     }
 
 
     try {
-        await router.post('qyasat/store', formData, {
+        await router.post('order/store', formData, {
             onSuccess: page => {
                 Swal.fire({
                     toast: true,
@@ -260,7 +210,7 @@ const addQyasat = async () => {
 
 
 
-const updateQyasat = async () => {
+const updateOrder = async () => {
     const formData = new FormData();
     formData.append('customer_name', customer_name.value);
     formData.append('customer_address', customer_address.value);
@@ -276,12 +226,12 @@ const updateQyasat = async () => {
 
 
 
-    for (const image of qyasatImages.value) {
-        formData.append('qyasat_images[]', image.raw)
+    for (const image of orderImages.value) {
+        formData.append('order_images[]', image.raw)
     }
 
     try {
-        await router.post('qyasat/update/' + id.value, formData, {
+        await router.post('order/update/' + id.value, formData, {
             onSuccess: page => {
                 Swal.fire({
                     toast: true,
@@ -324,7 +274,7 @@ const updateQyasat = async () => {
 }
 
 
-const deleteQyasat = (qyas, index) => {
+const deleteOrder = (order, index) => {
 
     Swal.fire({
 
@@ -340,10 +290,10 @@ const deleteQyasat = (qyas, index) => {
     }).then((result) => {
         if (result.isConfirmed) {
             try {
-                router.delete('qyasat/destroy/' + qyas.id, {
+                router.delete('order/destroy/' + order.id, {
                     onSuccess: (page) => {
 
-                        this.delete(qyas, index);
+                        this.delete(order, index);
 
 
                         Swal.fire({
@@ -381,9 +331,9 @@ const deleteImage = async (eimage, index) => {
 
     try {
 
-        await router.delete('qyasat/image/' + eimage.id, {
+        await router.delete('order/image/' + eimage.id, {
             onSuccess: (page) => {
-                qyasat_images.value.splice(index, 1);
+                order_images.value.splice(index, 1);
                 Swal.fire({
                     toast: true,
                     icon: 'success',
@@ -410,7 +360,7 @@ const deleteImage = async (eimage, index) => {
 
 
 
-const openOrderModal = (qyas) => {
+const openOrderModal = (order) => {
 
 
     try {
@@ -419,7 +369,7 @@ const openOrderModal = (qyas) => {
         orderDialogVisible.value = true;
         resetDatas();
 
-        qyas_id.value = qyas.id;
+        order_id.value = order.id;
 
 
 
@@ -435,7 +385,7 @@ const openOrderModal = (qyas) => {
 
 
 
-const submitQyas = (qyas) => {
+const submitOrder = (order) => {
 
     try {
 
@@ -450,6 +400,8 @@ const submitQyas = (qyas) => {
 
 
 }
+
+
 
 </script>
 
@@ -460,9 +412,9 @@ const submitQyas = (qyas) => {
         <el-dialog v-model="dialogVisible" width="500" :before-close="handleClose" style="border-radius: 2%">
             <section class=" bg-white dark:bg-gray-900">
                 <div class="py-8 px-4 mx-auto max-w-2xl ">
-                    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ editMode ? 'Edit Qyas' :
-                        'Add Qyas' }}</h2>
-                    <form @submit.prevent=" editMode ? updateQyasat() : addQyasat()">
+                    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ editMode ? 'Edit Order' :
+                        'Add Order' }}</h2>
+                    <form @submit.prevent=" editMode ? updateOrder() : addOrder()">
                         <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
 
                             <div class="sm:col-span-2">
@@ -512,7 +464,7 @@ const submitQyas = (qyas) => {
 
                         <div class="grid md:gap-6">
                             <div class="relative z-0 w-full mb-6 group">
-                                <el-upload v-model:file-list="qyasatImages" multiple list-type="picture-card"
+                                <el-upload v-model:file-list="orderImages" multiple list-type="picture-card"
                                     :on-preview="handlePictureCardPreview" :on-remove="handleRemove"
                                     :on-change="handleFileChange">
                                     <el-icon>
@@ -535,7 +487,7 @@ const submitQyas = (qyas) => {
 
                         <div class="flex flex-nowrap mb-8 gap-1">
 
-                            <div v-for="(eimage, index) in qyasat_images" class="relative w-32 h-32 ">
+                            <div v-for="(eimage, index) in order_images" class="relative w-32 h-32 ">
                                 <img class=" w-32 h-32 rounded" :src="eimage.image" alt="">
                                 <span
                                     class="absolute top-2 right-0 transform -translate-y-1/2 w-3.5 h-3.5 bg-red-400     border-2 border-white dark:border-gray-800 rounded-full">
@@ -569,144 +521,6 @@ const submitQyas = (qyas) => {
 
 
 
-        <!-- Order Dialog Start Here -->
-        <el-dialog v-model="orderDialogVisible" width="500" :before-close="handleClose" style="border-radius: 2%">
-            <section class=" bg-white dark:bg-gray-900">
-                <div class="py-8 px-4 mx-auto max-w-2xl ">
-                    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ 'Add To Order' }}</h2>
-                    <form @submit.prevent="submitQyas()">
-                        <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
-                            <div class="sm:col-span-2">
-                                <label for="qyas_id"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Qyas ID</label>
-                                <input v-model="qyas_id" type="text" name="qyas_id" id="qyas_id" disabled
-                                    class="bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Qyas ID" required="">
-                            </div>
-                            <div>
-                                <label for="order_color"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Color</label>
-                                <input v-model="order_color" type="text" name="order_color" id="order_color"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Type Order Color" required="">
-                            </div>
-
-                            <div>
-                                <label for="order_price"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Price
-                                </label>
-                                <input v-model="order_price" type="text" name="order_price" id="order_price"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Type Order Price" required="">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label for="order_resource"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                    Resource Type</label>
-                                <input v-model="order_resource" type="text" name="order_resource" id="order_resource"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Type Resource" required="">
-                            </div>
-                            <div>
-                                <label for="order_employee"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Wasta</label>
-                                <select v-model="order_employee" id="order_employee"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                    <option v-for="wasta in employee" :key="wasta.id" :value="wasta.id">
-                                        {{ wasta.name }}</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="order_employee_price_meter"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Price Per Meter
-                                </label>
-                                <input v-model="order_employee_price_meter" type="text"
-                                    name="order_employee_price_meter" id="order_employee_price_meter"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Type Order Price" required="">
-                            </div>
-
-
-
-                            <div>
-                                <label for="order_meter"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Meter
-                                </label>
-                                <input v-model="order_meter" type="text" name="order_meter" id="order_meter"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Type Order Meter" required="">
-                            </div>
-                            <div>
-                                <label for="order_employee_price_total"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Total Wasta
-                                    Price
-                                </label>
-                                <input v-model="order_employee_price_total" type="text"
-                                    name="order_employee_price_total" id="order_price"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Total Wasta Price" required="">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label for="description"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                                <textarea v-model="description" id="description" rows="3"
-                                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Your description here"></textarea>
-                            </div>
-                        </div>
-                        <br>
-                        <!-- Images Start here -->
-
-                        <div class="grid md:gap-6">
-                            <div class="relative z-0 w-full mb-6 group">
-                                <el-upload v-model:file-list="orderImages" multiple list-type="picture-card"
-                                    :on-preview="handlePictureCardPreviewOrder" :on-remove="handleRemove"
-                                    :on-change="handleFileChangeOrder">
-                                    <el-icon>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="1.5" stroke="currentColor" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M12 4.5v15m7.5-7.5h-15" />
-                                        </svg>
-
-                                    </el-icon>
-                                </el-upload>
-
-                            </div>
-
-                        </div>
-
-                        <!-- Images End Here -->
-
-                        <br>
-
-                        <div class="flex flex-nowrap mb-8 gap-1">
-
-                            <div v-for="(eimage, index) in qyasat_images" class="relative w-32 h-32 ">
-                                <img class=" w-32 h-32 rounded" :src="eimage.image" alt="">
-                                <span
-                                    class="absolute top-2 right-0 transform -translate-y-1/2 w-3.5 h-3.5 bg-red-400     border-2 border-white dark:border-gray-800 rounded-full">
-                                    <span @click="deleteImage(eimage, index)"
-                                        class="text-white text-xs font-vold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">x</span>
-                                </span>
-                            </div>
-                        </div>
-
-
-
-
-                        <button type="submit"
-                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">{{
-                                editMode ? 'Edit' : 'Add' }}</button>
-                    </form>
-                </div>
-            </section>
-
-        </el-dialog>
-
-        <!-- Order Dialog End Here -->
 
 
 
@@ -736,43 +550,10 @@ const submitQyas = (qyas) => {
                     </div>
                     <div
                         class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                        <button type="button" @click="openAddModal" v-if="permission.canEditQyasat"
-                            class="flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primarbluey-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                            <svg class="h-3.5 w-3.5 mr-2" fill="currentColor" viewbox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path clip-rule="evenodd" fill-rule="evenodd"
-                                    d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
-                            </svg>
-                            Add Qyas
-                        </button>
+
                         <div class="flex items-center space-x-3 w-full md:w-auto">
-                            <button id="actionsDropdownButton" data-dropdown-toggle="actionsDropdown"
-                                v-if="permission.canEditQyasat"
-                                class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                                type="button">
-                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                    <path clip-rule="evenodd" fill-rule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                </svg>
-                                Actions
-                            </button>
-                            <div id="actionsDropdown"
-                                class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
-                                <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                                    aria-labelledby="actionsDropdownButton">
-                                    <li>
-                                        <a href="#"
-                                            class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Mass
-                                            Edit</a>
-                                    </li>
-                                </ul>
-                                <div class="py-1">
-                                    <a href="#"
-                                        class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Delete
-                                        all</a>
-                                </div>
-                            </div>
+
+
                             <button id="filterDropdownButton" data-dropdown-toggle="filterDropdown"
                                 class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                                 type="button">
@@ -842,21 +623,31 @@ const submitQyas = (qyas) => {
                                 <th scope="col" class="px-4 py-3">Customer Address</th>
                                 <th scope="col" class="px-4 py-3">Work Type</th>
                                 <th scope="col" class="px-4 py-3">Image/File</th>
-                                <th scope="col" class="px-4 py-3">In Order</th>
+                                <th scope="col" class="px-4 py-3">Is Done</th>
+                                <th scope="col" class="px-4 py-3">Status</th>
                                 <th scope="col" class="px-4 py-3">Actions</th>
 
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="qyas in qyasat" :key="qyas.id" class="border-b dark:border-gray-700">
+                            <tr v-for="order in orders" :key="order.id" class="border-b dark:border-gray-700">
                                 <th scope="row"
                                     class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    {{ qyas.customer_name }}</th>
-                                <td class="px-4 py-3">{{ qyas.formatted_phone }}</td>
-                                <td class="px-4 py-3">{{ qyas.customer_address }}</td>
-                                <td class="px-4 py-3">{{ qyas.type }} </td>
+                                    {{ order.qyas.customer_name }}</th>
+                                <td class="px-4 py-3">{{ order.qyas.formatted_phone }}</td>
+                                <td class="px-4 py-3">{{ order.qyas.customer_address }}</td>
+                                <td class="px-4 py-3">{{ order.qyas.type }} </td>
+
+
+
                                 <td class="px-4 py-3">
-                                    <div v-for="(image, index) in qyas.qyasat_files">
+                                    <div v-for="(image, index) in order.qyas.qyasat_files">
+
+                                        <a class="text-blue-500" :href="image.image" target="_blank"> File {{
+                                            (index + 1) }}</a>
+                                    </div>
+
+                                    <div v-for="(image, index) in order.qyas.order_detail.order_detail_files">
 
                                         <a class="text-blue-500" :href="image.image" target="_blank"> File {{
                                             (index + 1) }}</a>
@@ -865,26 +656,24 @@ const submitQyas = (qyas) => {
                                 </td>
 
                                 <td class="px-4 py-3">
-                                    <div v-if="permission.canEditQyasat">
-
-                                        <span v-if="qyas.inOrder == 1"
-                                            class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Submited</span>
-                                        <button v-else @click="openOrderModal(qyas)"
-                                            class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
-                                            Not Submited
-                                        </button>
-
-
-                                    </div>
-                                    <span v-else
-                                        class="bg-red-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Not
-                                        Authorized</span>
-
-
+                                    <span v-if="order.isDone == 1"
+                                        class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Done</span>
+                                    <button v-else @click="openOrderModal(order)"
+                                        class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
+                                        Waiting
+                                    </button>
                                 </td>
+                                <td class="px-4 py-3">
+                                    <span v-if="order.isSumbited == 1"
+                                        class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Submited</span>
+                                    <button v-else @click="openOrderModal(qyas)"
+                                        class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
+                                        Not Submited
+                                    </button>
+                                </td>
+
                                 <td class="px-4 py-3 flex items-center justify-end">
-                                    <button :id="qyas.id + '-button'" :data-dropdown-toggle="qyas.id + '-dropdown'"
-                                        v-if="permission.canEditQyasat"
+                                    <button :id="order.id + '-button'" :data-dropdown-toggle="order.id + '-dropdown'"
                                         class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
                                         type="button">
                                         <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20"
@@ -893,21 +682,21 @@ const submitQyas = (qyas) => {
                                                 d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
                                         </svg>
                                     </button>
-                                    <div :id="qyas.id + '-dropdown'"
+                                    <div :id="order.id + '-dropdown'"
                                         class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
                                         <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                                            :aria-labelledby="qyas.id + '-dropdown'">
+                                            :aria-labelledby="order.id + '-dropdown'">
                                             <li>
                                                 <a href="#"
                                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Show</a>
                                             </li>
                                             <li>
-                                                <a @click="openEditModal(qyas)" href="#"
+                                                <a @click="openEditModal(order)" href="#"
                                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</a>
                                             </li>
                                         </ul>
                                         <div class="py-1">
-                                            <a href="#" @click="deleteQyasat(qyas, index)"
+                                            <a href="#" @click="deleteOrder(order, index)"
                                                 class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Delete</a>
                                         </div>
                                     </div>
@@ -923,7 +712,7 @@ const submitQyas = (qyas) => {
                         Showing
                         <span class="font-semibold text-gray-900 dark:text-white">1-10</span>
                         of
-                        <span class="font-semibold text-gray-900 dark:text-white">{{ qyasat.length }}</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ orders.length }}</span>
                     </span>
                     <ul class="inline-flex items-stretch -space-x-px">
                         <li>

@@ -158,6 +158,8 @@ class EmployeeController extends Controller
         $employeePermessions->canEditEmployee = $request->canEditEmployee;
         $employeePermessions->canViewQyasat = $request->canViewQyasat;
         $employeePermessions->canEditQyasat = $request->canEditQyasat;
+        $employeePermessions->canViewOrder = $request->canViewOrder;
+        $employeePermessions->canEditOrder = $request->canEditOrder;
 
 
 

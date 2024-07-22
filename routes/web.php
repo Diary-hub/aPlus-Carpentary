@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\QyasatController;
 use App\Http\Controllers\User\UserController;
@@ -96,9 +97,18 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(func
     //Qyasat Route
     Route::get('/qyasat', [QyasatController::class, 'index'])->name('admin.qyasat.index');
     Route::post('/qyasat/store', [QyasatController::class, 'store'])->name('admin.qyasat.store');
+    Route::post('/qyasat/store/order', [QyasatController::class, 'storeOrder'])->name('admin.qyasat.store.order');
     Route::put('/qyasat/update/{id}', [QyasatController::class, 'update'])->name('admin.qyasat.update');
     Route::delete('/qyasat/destroy/{id}', [QyasatController::class, 'destroy'])->name('admin.qyasat.destroy');
     Route::delete('/qyasat/image/{id}', [QyasatController::class, 'deleteImage'])->name('admin.qyasat.image.delete');
+
+
+    //Orders Route
+    Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders.index');
+    Route::post('/orders/store', [QyasatController::class, 'store'])->name('admin.orders.store');
+    Route::put('/orders/update/{id}', [QyasatController::class, 'update'])->name('admin.orders.update');
+    Route::delete('/orders/destroy/{id}', [QyasatController::class, 'destroy'])->name('admin.orders.destroy');
+    Route::delete('/orders/image/{id}', [QyasatController::class, 'deleteImage'])->name('admin.orders.image.delete');
 });
 // Admin Routes End
 
@@ -147,11 +157,19 @@ Route::middleware(['auth', UserMiddleware::class])->prefix('user')->group(functi
     Route::delete('/employees/image/{id}', [EmployeeController::class, 'deleteImage'])->name('user.employees.image.delete');
 
     //Qyasat Route
-    Route::get('/qyasat', [QyasatController::class, 'index'])->name('admin.qyasat.index');
-    Route::post('/qyasat/store', [QyasatController::class, 'store'])->name('admin.qyasat.store');
-    Route::put('/qyasat/update/{id}', [QyasatController::class, 'update'])->name('admin.qyasat.update');
-    Route::delete('/qyasat/destroy/{id}', [QyasatController::class, 'destroy'])->name('admin.qyasat.destroy');
-    Route::delete('/qyasat/image/{id}', [QyasatController::class, 'deleteImage'])->name('admin.qyasat.image.delete');
+    Route::get('/qyasat', [QyasatController::class, 'index'])->name('user.qyasat.index');
+    Route::post('/qyasat/store', [QyasatController::class, 'store'])->name('user.qyasat.store');
+    Route::put('/qyasat/update/{id}', [QyasatController::class, 'update'])->name('user.qyasat.update');
+    Route::delete('/qyasat/destroy/{id}', [QyasatController::class, 'destroy'])->name('user.qyasat.destroy');
+    Route::delete('/qyasat/image/{id}', [QyasatController::class, 'deleteImage'])->name('user.qyasat.image.delete');
+
+
+    //Orders Route
+    Route::get('/orders', [OrderController::class, 'index'])->name('user.orders.index');
+    Route::post('/orders/store', [OrderController::class, 'store'])->name('user.orders.store');
+    Route::put('/orders/update/{id}', [OrderController::class, 'update'])->name('user.orders.update');
+    Route::delete('/orders/destroy/{id}', [OrderController::class, 'destroy'])->name('user.orders.destroy');
+    Route::delete('/orders/image/{id}', [OrderController::class, 'deleteImage'])->name('user.orders.image.delete');
 });
 
 // User Route End

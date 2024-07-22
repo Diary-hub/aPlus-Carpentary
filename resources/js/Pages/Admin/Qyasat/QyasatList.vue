@@ -8,7 +8,7 @@ import { watch } from 'vue';
 
 
 const props = defineProps({
-
+    employee: Array,
     qyasat: Array,
 })
 
@@ -29,11 +29,61 @@ const customer_address = ref('');
 const customer_phone = ref('');
 const description = ref('');
 const image = ref('');
+const inOrder = ref('');
+
+
+
 
 const qyasat_images = ref([]);
 const qyasatImages = ref([]);
 
 const dialogImageUrl = ref('');
+
+
+// Order Variables
+
+
+const isAddOrder = ref(false);
+const orderDialogVisible = ref(false);
+
+
+const qyas_id = ref('');
+const order_id = ref('');
+const order_color = ref('');
+const order_price = ref('');
+const order_resource = ref('');
+const order_description = ref('');
+
+const order_images = ref([]);
+const orderImages = ref([]);
+
+const orderDialogImageUrl = ref('');
+
+const order_employee = ref('');
+const order_employee_price_meter = ref('');
+const order_meter = ref('');
+const order_employee_price_total = ref('');
+
+
+watch([order_employee_price_meter, order_meter], () => {
+    order_employee_price_total.value = order_employee_price_meter.value * order_meter.value;
+});
+
+
+
+
+
+
+const handleFileChangeOrder = (file) => {
+    orderImages.value.push(file);
+}
+
+
+const handlePictureCardPreviewOrder = (file) => {
+    orderDialogImageUrl.value = file.url;
+    orderDialogVisible.value = true;
+}
+
 
 
 
@@ -77,6 +127,27 @@ const resetDatas = () => {
     qyasat_images.value = '';
     qyasatImages.value = '';
 
+    inOrder.value = '';
+
+
+
+    qyas_id.value = '';
+    order_id.value = '';
+    order_color.value = '';
+    order_price.value = '';
+    order_resource.value = '';
+    order_images.value = '';
+    orderImages.value = '';
+    order_description.value = '';
+
+    orderDialogImageUrl.value = '';
+
+    order_employee.value = '';
+    order_employee_price_meter.value = '';
+    order_meter.value = '';
+    order_employee_price_total.value = '';
+
+
 
 
 
@@ -106,6 +177,7 @@ const openEditModal = (qyas) => {
 
     // Update the data based on the selected qyas
     id.value = qyas.id;
+
     type.value = qyas.type;
     customer_name.value = qyas.customer_name;
     customer_address.value = qyas.customer_address;
@@ -113,6 +185,7 @@ const openEditModal = (qyas) => {
     image.value = qyas.image;
     description.value = qyas.description;
     qyasat_images.value = qyas.qyasat_files;
+    inOrder.value = qyas.inOrder;
 
 
 
@@ -136,6 +209,7 @@ const addQyasat = async () => {
     formData.append('image', image.value);
     formData.append('description', description.value);
     formData.append('type', type.value);
+    formData.append('inOrder', inOrder.value);
 
 
     for (const image of qyasatImages.value) {
@@ -191,7 +265,7 @@ const updateQyasat = async () => {
     formData.append('image', image.value);
     formData.append('description', description.value);
     formData.append('type', type.value);
-
+    formData.append('inOrder', inOrder.value);
     formData.append('_method', "PUT");
 
 
@@ -332,6 +406,83 @@ const deleteImage = async (eimage, index) => {
 }
 
 
+
+const openOrderModal = (qyas) => {
+
+
+    try {
+
+        isAddOrder.value = true;
+        orderDialogVisible.value = true;
+        resetDatas();
+
+        qyas_id.value = qyas.id;
+
+
+
+
+    } catch (error) {
+        console.log(error);
+    }
+
+
+
+
+}
+
+
+
+const submitQyas = async (qyas) => {
+    const formData = new FormData();
+    formData.append('qyas_id', qyas_id.value);
+    formData.append('employee_id', order_employee.value);
+    formData.append('color', order_color.value);
+    formData.append('price', order_price.value);
+    formData.append('description', order_description.value);
+    formData.append('resource_type', order_resource.value);
+    formData.append('price_meter', order_employee_price_meter.value);
+    formData.append('meter', order_meter.value);
+    formData.append('total_meter_price', order_employee_price_total.value);
+
+
+    for (const image of orderImages.value) {
+        formData.append('order_detail_images[]', image.raw)
+    }
+
+
+    try {
+        await router.post('qyasat/store/order', formData, {
+            onSuccess: page => {
+                Swal.fire({
+                    toast: true,
+                    icon: 'success',
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    title: page.props.flash.success
+                })
+
+                dialogVisible.value = false;
+                resetDatas();
+
+
+
+
+            },
+            onError: error => {
+                console.log(error);
+            }
+
+
+        })
+    } catch (error) {
+        console.log(error);
+    }
+
+
+
+}
+
 </script>
 
 <template>
@@ -438,6 +589,156 @@ const deleteImage = async (eimage, index) => {
 
         </el-dialog>
         <!-- Dialog End -->
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- Order Dialog Start Here -->
+        <el-dialog v-model="orderDialogVisible" width="500" :before-close="handleClose" style="border-radius: 2%">
+            <section class=" bg-white dark:bg-gray-900">
+                <div class="py-8 px-4 mx-auto max-w-2xl ">
+                    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ 'Add To Order' }}</h2>
+                    <form @submit.prevent="submitQyas()">
+                        <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
+                            <div class="sm:col-span-2">
+                                <label for="qyas_id"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Qyas ID</label>
+                                <input v-model="qyas_id" type="text" name="qyas_id" id="qyas_id" disabled
+                                    class="bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="Qyas ID" required="">
+                            </div>
+                            <div>
+                                <label for="order_color"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Color</label>
+                                <input v-model="order_color" type="text" name="order_color" id="order_color"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="Type Order Color" required="">
+                            </div>
+
+                            <div>
+                                <label for="order_price"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Price
+                                </label>
+                                <input v-model="order_price" type="text" name="order_price" id="order_price"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="Type Order Price" required="">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label for="order_resource"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                    Resource Type</label>
+                                <input v-model="order_resource" type="text" name="order_resource" id="order_resource"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="Type Resource" required="">
+                            </div>
+                            <div>
+                                <label for="order_employee"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Wasta</label>
+                                <select v-model="order_employee" id="order_employee"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                    <option v-for="wasta in employee" :key="wasta.id" :value="wasta.id">
+                                        {{ wasta.name }}</option>
+
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="order_employee_price_meter"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Price Per Meter
+                                </label>
+                                <input v-model="order_employee_price_meter" type="text"
+                                    name="order_employee_price_meter" id="order_employee_price_meter"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="Type Order Price" required="">
+                            </div>
+
+
+
+                            <div>
+                                <label for="order_meter"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Meter
+                                </label>
+                                <input v-model="order_meter" type="text" name="order_meter" id="order_meter"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="Type Order Meter" required="">
+                            </div>
+                            <div>
+                                <label for="order_employee_price_total"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Total Wasta
+                                    Price
+                                </label>
+                                <input v-model="order_employee_price_total" type="text"
+                                    name="order_employee_price_total" id="order_price"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="Total Wasta Price" required="">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label for="description"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                                <textarea v-model="order_description" id="description" rows="3"
+                                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="Your description here"></textarea>
+                            </div>
+                        </div>
+                        <br>
+                        <!-- Images Start here -->
+
+                        <div class="grid md:gap-6">
+                            <div class="relative z-0 w-full mb-6 group">
+                                <el-upload v-model:file-list="orderImages" multiple list-type="picture-card"
+                                    :on-preview="handlePictureCardPreviewOrder" :on-remove="handleRemove"
+                                    :on-change="handleFileChangeOrder">
+                                    <el-icon>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M12 4.5v15m7.5-7.5h-15" />
+                                        </svg>
+
+                                    </el-icon>
+                                </el-upload>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Images End Here -->
+
+                        <br>
+
+                        <div class="flex flex-nowrap mb-8 gap-1">
+
+                            <div v-for="(eimage, index) in qyasat_images" class="relative w-32 h-32 ">
+                                <img class=" w-32 h-32 rounded" :src="eimage.image" alt="">
+                                <span
+                                    class="absolute top-2 right-0 transform -translate-y-1/2 w-3.5 h-3.5 bg-red-400     border-2 border-white dark:border-gray-800 rounded-full">
+                                    <span @click="deleteImage(eimage, index)"
+                                        class="text-white text-xs font-vold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">x</span>
+                                </span>
+                            </div>
+                        </div>
+
+
+
+
+                        <button type="submit"
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">{{
+                                editMode ? 'Edit' : 'Add' }}</button>
+                    </form>
+                </div>
+            </section>
+
+        </el-dialog>
+
+        <!-- Order Dialog End Here -->
 
 
 
@@ -572,6 +873,7 @@ const deleteImage = async (eimage, index) => {
                                 <th scope="col" class="px-4 py-3">Customer Address</th>
                                 <th scope="col" class="px-4 py-3">Work Type</th>
                                 <th scope="col" class="px-4 py-3">Image/File</th>
+                                <th scope="col" class="px-4 py-3">In Order</th>
                                 <th scope="col" class="px-4 py-3">Actions</th>
 
                             </tr>
@@ -593,7 +895,14 @@ const deleteImage = async (eimage, index) => {
 
                                 </td>
 
-
+                                <td class="px-4 py-3">
+                                    <span v-if="qyas.inOrder == 1"
+                                        class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Submited</span>
+                                    <button v-else @click="openOrderModal(qyas)"
+                                        class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
+                                        Not Submited
+                                    </button>
+                                </td>
                                 <td class="px-4 py-3 flex items-center justify-end">
                                     <button :id="qyas.id + '-button'" :data-dropdown-toggle="qyas.id + '-dropdown'"
                                         class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
