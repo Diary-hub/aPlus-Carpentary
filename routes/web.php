@@ -105,10 +105,10 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(func
 
     //Orders Route
     Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders.index');
-    Route::post('/orders/store', [QyasatController::class, 'store'])->name('admin.orders.store');
-    Route::put('/orders/update/{id}', [QyasatController::class, 'update'])->name('admin.orders.update');
-    Route::delete('/orders/destroy/{id}', [QyasatController::class, 'destroy'])->name('admin.orders.destroy');
-    Route::delete('/orders/image/{id}', [QyasatController::class, 'deleteImage'])->name('admin.orders.image.delete');
+    Route::post('/orders/store', [OrderController::class, 'store'])->name('admin.orders.store');
+    Route::put('/orders/update/{id}', [OrderController::class, 'update'])->name('admin.orders.update');
+    Route::delete('/orders/destroy/{id}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
+    Route::delete('/orders/image/{id}', [OrderController::class, 'deleteImage'])->name('admin.orders.image.delete');
 });
 // Admin Routes End
 
@@ -159,6 +159,7 @@ Route::middleware(['auth', UserMiddleware::class])->prefix('user')->group(functi
     //Qyasat Route
     Route::get('/qyasat', [QyasatController::class, 'index'])->name('user.qyasat.index');
     Route::post('/qyasat/store', [QyasatController::class, 'store'])->name('user.qyasat.store');
+    Route::post('/qyasat/store/order', [QyasatController::class, 'storeOrder'])->name('user.qyasat.store.order');
     Route::put('/qyasat/update/{id}', [QyasatController::class, 'update'])->name('user.qyasat.update');
     Route::delete('/qyasat/destroy/{id}', [QyasatController::class, 'destroy'])->name('user.qyasat.destroy');
     Route::delete('/qyasat/image/{id}', [QyasatController::class, 'deleteImage'])->name('user.qyasat.image.delete');

@@ -434,7 +434,7 @@ const openOrderModal = (qyas) => {
 
 const submitQyas = async (qyas) => {
     const formData = new FormData();
-    formData.append('qyas_id', qyas_id.value);
+    formData.append('qyasat_id', qyas_id.value);
     formData.append('employee_id', order_employee.value);
     formData.append('color', order_color.value);
     formData.append('price', order_price.value);

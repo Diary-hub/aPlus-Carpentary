@@ -613,9 +613,9 @@ const submitOrder = (order) => {
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
-                                <th scope="col" class="px-4 py-3">Customer name</th>
+                                <th scope="col" class="px-4 py-3">Customer Name</th>
                                 <th scope="col" class="px-4 py-3">Customer Phone</th>
-                                <th scope="col" class="px-4 py-3">Customer Address</th>
+                                <th scope="col" class="px-4 py-3">Employee Name</th>
                                 <th scope="col" class="px-4 py-3">Work Type</th>
                                 <th scope="col" class="px-4 py-3">Image/File</th>
                                 <th scope="col" class="px-4 py-3">Is Done</th>
@@ -630,7 +630,7 @@ const submitOrder = (order) => {
                                     class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     {{ order.qyas.customer_name }}</th>
                                 <td class="px-4 py-3">{{ order.qyas.formatted_phone }}</td>
-                                <td class="px-4 py-3">{{ order.qyas.customer_address }}</td>
+                                <td class="px-4 py-3">{{ order.employee.name }}</td>
                                 <td class="px-4 py-3">{{ order.qyas.type }} </td>
 
 
@@ -648,12 +648,18 @@ const submitOrder = (order) => {
                                             (index + 1) }}</a>
                                     </div>
 
+                                    <div v-for="(image, index) in order.order_files">
+
+                                        <a class="text-blue-500" :href="image.image" target="_blank"> File {{
+                                            (index + 1) }}</a>
+                                    </div>
+
                                 </td>
 
                                 <td class="px-4 py-3">
                                     <span v-if="order.isDone == 1"
                                         class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Done</span>
-                                    <button v-else @click="openOrderModal(order)"
+                                    <button v-else @click="openAddModal(order)"
                                         class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
                                         Waiting
                                     </button>

@@ -147,13 +147,13 @@ class QyasatController extends Controller
             }
         }
 
-        $qyas = Qyasat::findOrFail($request->qyas_id);
+        $qyas = Qyasat::findOrFail($request->qyasat_id);
         $qyas->inOrder = 1;
         $qyas->save();
 
         $order = Order::create([
             'employee_id' => $orderDetail->employee_id,
-            'qyas_id' => $orderDetail->qyas_id,
+            'qyas_id' => $orderDetail->qyasat_id,
 
         ]);
 

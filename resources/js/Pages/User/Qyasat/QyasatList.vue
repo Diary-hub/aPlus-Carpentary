@@ -57,6 +57,7 @@ const order_id = ref('');
 const order_color = ref('');
 const order_price = ref('');
 const order_resource = ref('');
+const order_description = ref('');
 
 const order_images = ref([]);
 const orderImages = ref([]);
@@ -128,8 +129,8 @@ const resetDatas = () => {
 
 
     dialogImageUrl.value = '';
-    qyasat_images.value = '';
-    qyasatImages.value = '';
+    qyasat_images.value = [];
+    qyasatImages.value = [];
 
     inOrder.value = '';
 
@@ -140,8 +141,9 @@ const resetDatas = () => {
     order_color.value = '';
     order_price.value = '';
     order_resource.value = '';
-    order_images.value = '';
-    orderImages.value = '';
+    order_description.value = '';
+    order_images.value = [];
+    orderImages.value = [];
 
     orderDialogImageUrl.value = '';
 
@@ -435,18 +437,53 @@ const openOrderModal = (qyas) => {
 
 
 
-const submitQyas = (qyas) => {
+const submitQyas = async (qyas) => {
+    const formData = new FormData();
+    formData.append('qyasat_id', qyas_id.value);
+    formData.append('employee_id', order_employee.value);
+    formData.append('color', order_color.value);
+    formData.append('price', order_price.value);
+    formData.append('description', order_description.value);
+    formData.append('resource_type', order_resource.value);
+    formData.append('price_meter', order_employee_price_meter.value);
+    formData.append('meter', order_meter.value);
+    formData.append('total_meter_price', order_employee_price_total.value);
+
+
+    for (const image of orderImages.value) {
+        formData.append('order_detail_images[]', image.raw)
+    }
+
 
     try {
+        await router.post('qyasat/store/order', formData, {
+            onSuccess: page => {
+                Swal.fire({
+                    toast: true,
+                    icon: 'success',
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    title: page.props.flash.success
+                })
+
+                dialogVisible.value = false;
+                resetDatas();
 
 
 
 
+            },
+            onError: error => {
+                console.log(error);
+            }
 
 
+        })
     } catch (error) {
         console.log(error);
     }
+
 
 
 }
@@ -649,9 +686,9 @@ const submitQyas = (qyas) => {
                                     placeholder="Total Wasta Price" required="">
                             </div>
                             <div class="sm:col-span-2">
-                                <label for="description"
+                                <label for="order_description"
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                                <textarea v-model="description" id="description" rows="3"
+                                <textarea v-model="order_description" id="order_description" rows="3"
                                     class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                     placeholder="Your description here"></textarea>
                             </div>

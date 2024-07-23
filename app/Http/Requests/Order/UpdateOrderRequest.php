@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Admin;
+namespace App\Http\Requests\Order;
 
 use App\Models\PermessionModel;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class StoreOrderDetailRequest extends FormRequest
+class UpdateOrderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -33,15 +33,15 @@ class StoreOrderDetailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'qyasat_id' => 'required|integer',
-            'employee_id' => 'required|integer',
-            'color' => 'required|string|max:200',
-            'price' => 'required',
-            'resource_type' => 'required|string|max:200',
-            'description' => 'nullable|string',
-            'price_meter' => 'required',
-            'meter' => 'required',
-            'total_meter_price' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required',
+            'house_date' => 'required',
+            'isDone' => 'nullable',
+            'isSumbited' => 'nullable',
+
+            'items' => 'required|array',
+            'items.*.name' => 'required|string|max:255',
+            'items.*.quantity' => 'required|integer|min:1',
 
             'created_by' => 'nullable|integer',
             'updated_by' => 'nullable|integer',

@@ -486,9 +486,12 @@ const deleteProduct = (product, index) => {
                                     {{ product.name }}</th>
                                 <td class="px-4 py-3">{{ product.quantity }}</td>
                                 <td class="px-4 py-3">{{ product.color }}</td>
-                                <td class="px-4 py-3">{{ parseInt(product.dinar_price) }} IQD</td>
-                                <td class="px-4 py-3">{{ product.dolar_price }} $</td>
-                                <td class="px-4 py-3">{{ parseInt(product.dolar_data) }} IQD</td>
+                                <td class="px-4 py-3">{{ permission.canEditProduct ? parseInt(product.dinar_price) :
+                                    '****' }} IQD</td>
+                                <td class="px-4 py-3">{{ permission.canEditProduct ? product.dolar_price : '****' }} $
+                                </td>
+                                <td class="px-4 py-3">{{ permission.canEditProduct ? parseInt(product.dolar_data) :
+                                    '****' }} IQD</td>
                                 <td class="px-4 py-3">{{ product.category.name }}</td>
                                 <td class="px-4 py-3">{{ product.company.name }}</td>
                                 <td class="px-4 py-3">

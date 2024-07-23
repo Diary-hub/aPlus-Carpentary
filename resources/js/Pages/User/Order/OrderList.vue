@@ -52,7 +52,7 @@ const DialogImageUrl = ref('');
 
 
 
-
+const items = ref([{ name: '', quantity: '' }]);
 
 
 
@@ -92,11 +92,10 @@ const resetDatas = () => {
     end_date.value = '';
     house_date.value = '';
 
-    dialogImageUrl.value = '';
-    order_images.value = '';
-    orderImages.value = '';
-
-
+    DialogImageUrl.value = '';
+    order_images.value = [];
+    orderImages.value = [];
+    items.value = [{ name: '', quantity: '' }];
 
 
 
@@ -105,13 +104,13 @@ const resetDatas = () => {
 
 }
 
-const openAddModal = () => {
+const openAddModal = (order) => {
     isAddOrder.value = true;
     dialogVisible.value = true;
     editMode.value = false;
 
     resetDatas();
-
+    id.value = order.id;
 
 
 }
@@ -123,6 +122,7 @@ const openAddModal = () => {
 
 
 const openEditModal = (order) => {
+    resetDatas();
     isAddOrder.value = false;
     editMode.value = true;
     dialogVisible.value = true;
@@ -171,7 +171,7 @@ const addOrder = async () => {
 
 
     try {
-        await router.post('order/store', formData, {
+        await router.post('orders/store', formData, {
             onSuccess: page => {
                 Swal.fire({
                     toast: true,
@@ -207,18 +207,28 @@ const addOrder = async () => {
 
 }
 
+const submitForm = () => {
+    const formattedItems = items.value.map(item => ({
+        name: item.name,
+        quantity: item.quantity
+    }));
 
+    return formattedItems;
+};
 
 
 const updateOrder = async () => {
+    const formattedItems = submitForm();
     const formData = new FormData();
-    formData.append('customer_name', customer_name.value);
-    formData.append('customer_address', customer_address.value);
-    formData.append('customer_phone', customer_phone.value);
-    formData.append('image', image.value);
-    formData.append('description', description.value);
-    formData.append('type', type.value);
-    formData.append('inOrder', inOrder.value);
+    formData.append('start_date', start_date.value);
+    formData.append('end_date', end_date.value);
+    formData.append('house_date', house_date.value);
+    formData.append('isDone', 1);
+    formattedItems.forEach((item, index) => {
+        formData.append(`items[${index}][name]`, item.name);
+        formData.append(`items[${index}][quantity]`, item.quantity);
+    });
+
     formData.append('_method', "PUT");
 
 
@@ -231,7 +241,7 @@ const updateOrder = async () => {
     }
 
     try {
-        await router.post('order/update/' + id.value, formData, {
+        await router.post('orders/update/' + id.value, formData, {
             onSuccess: page => {
                 Swal.fire({
                     toast: true,
@@ -290,10 +300,10 @@ const deleteOrder = (order, index) => {
     }).then((result) => {
         if (result.isConfirmed) {
             try {
-                router.delete('order/destroy/' + order.id, {
+                router.delete('orders/destroy/' + order.id, {
                     onSuccess: (page) => {
 
-                        this.delete(order, index);
+                        // this.delete(order, index);
 
 
                         Swal.fire({
@@ -331,7 +341,7 @@ const deleteImage = async (eimage, index) => {
 
     try {
 
-        await router.delete('order/image/' + eimage.id, {
+        await router.delete('orders/image/' + eimage.id, {
             onSuccess: (page) => {
                 order_images.value.splice(index, 1);
                 Swal.fire({
@@ -403,6 +413,10 @@ const submitOrder = (order) => {
 
 
 
+const addItem = () => {
+    items.value.push({ name: '', quantity: '' });
+};
+
 </script>
 
 <template>
@@ -412,52 +426,72 @@ const submitOrder = (order) => {
         <el-dialog v-model="dialogVisible" width="500" :before-close="handleClose" style="border-radius: 2%">
             <section class=" bg-white dark:bg-gray-900">
                 <div class="py-8 px-4 mx-auto max-w-2xl ">
-                    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ editMode ? 'Edit Order' :
-                        'Add Order' }}</h2>
-                    <form @submit.prevent=" editMode ? updateOrder() : addOrder()">
-                        <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
+                    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ 'Edit Order'
+                        }}</h2>
+                    <form @submit.prevent="updateOrder()">
+                        <div class="grid   gap-6">
 
                             <div class="sm:col-span-2">
-                                <label for="type"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Type</label>
-                                <input v-model="type" type="text" name="type" id="type"
+                                <label for="start_date"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start
+                                    Date</label>
+                                <input v-model="start_date" type="date" name="start_date" id="start_date"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Type of Work" required="">
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <label for="customer_name"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Customer
-                                    Name</label>
-                                <input v-model="customer_name" type="text" name="customer_name" id="customer_name"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Type Customer Name" required="">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label for="customer_phone"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Customer
-                                    Phone</label>
-                                <input v-model="customer_phone" type="text" name="customer_phone" id="customer_phone"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Customer Phone" required="">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label for="customer_address"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Customer
-                                    Address</label>
-                                <input v-model.number="customer_address" type="text" name="customer_address"
-                                    id="customer_address"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Customer Address" required>
+                                    placeholder="Start Date" required="">
                             </div>
 
                             <div class="sm:col-span-2">
-                                <label for="description"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                                <textarea v-model="description" id="description" rows="3"
-                                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Your description here"></textarea>
+                                <label for="end_date"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">End
+                                    Date</label>
+                                <input v-model="end_date" type="date" name="end_date" id="end_date"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="End Date" required="">
                             </div>
+                            <div class="sm:col-span-2">
+                                <label for="house_date"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">House
+                                    Date</label>
+                                <input v-model="house_date" type="date" name="house_date" id="house_date"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="House Date" required="">
+                            </div>
+                            <button @click="addItem" type="button"
+                                class="bg-blue-500 text-white px-4 sm:col-span-2 py-2 rounded-lg">Add
+                                Item</button>
+
+
+
+
+
+                            <div class="sm:col-span-2">
+                                <div v-for="(item, index) in items" :key="index" class="mb-4 flex space-x-4">
+                                    <div class="flex-1">
+                                        <label for="item_name"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Item
+                                            Name</label>
+                                        <input v-model="item.name" type="text" name="item_name" id="item_name"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                            placeholder="Item Name" required>
+                                    </div>
+                                    <div class="flex-1">
+                                        <label for="item_quantity"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Item
+                                            Quantity</label>
+                                        <input v-model="item.quantity" type="number" name="item_quantity"
+                                            id="item_quantity"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                            placeholder="Item Quantity" required>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+
+
+
                         </div>
                         <br>
                         <!-- Images Start here -->
@@ -502,7 +536,7 @@ const submitOrder = (order) => {
 
                         <button type="submit"
                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">{{
-                                editMode ? 'Edit' : 'Add' }}</button>
+                                'Edit' }}</button>
                     </form>
                 </div>
             </section>
@@ -630,7 +664,7 @@ const submitOrder = (order) => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="order in orders" :key="order.id" class="border-b dark:border-gray-700">
+                            <tr v-for="(order, index) in orders" :key="order.id" class="border-b dark:border-gray-700">
                                 <th scope="row"
                                     class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     {{ order.qyas.customer_name }}</th>
@@ -653,12 +687,18 @@ const submitOrder = (order) => {
                                             (index + 1) }}</a>
                                     </div>
 
+                                    <div v-for="(image, index) in order.order_files">
+
+                                        <a class="text-blue-500" :href="image.image" target="_blank"> File {{
+                                            (index + 1) }}</a>
+                                    </div>
+
                                 </td>
 
                                 <td class="px-4 py-3">
                                     <span v-if="order.isDone == 1"
                                         class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Done</span>
-                                    <button v-else @click="openOrderModal(order)"
+                                    <button v-else @click="openAddModal(order)"
                                         class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
                                         Waiting
                                     </button>
@@ -666,7 +706,7 @@ const submitOrder = (order) => {
                                 <td class="px-4 py-3">
                                     <span v-if="order.isSumbited == 1"
                                         class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Submited</span>
-                                    <button v-else @click="openOrderModal(qyas)"
+                                    <button v-else @click="openOrderModal(order)"
                                         class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
                                         Not Submited
                                     </button>
@@ -684,17 +724,7 @@ const submitOrder = (order) => {
                                     </button>
                                     <div :id="order.id + '-dropdown'"
                                         class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
-                                        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                                            :aria-labelledby="order.id + '-dropdown'">
-                                            <li>
-                                                <a href="#"
-                                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Show</a>
-                                            </li>
-                                            <li>
-                                                <a @click="openEditModal(order)" href="#"
-                                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</a>
-                                            </li>
-                                        </ul>
+
                                         <div class="py-1">
                                             <a href="#" @click="deleteOrder(order, index)"
                                                 class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Delete</a>
